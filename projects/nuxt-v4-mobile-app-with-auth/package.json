@@ -10,7 +10,7 @@
     "preview": "nuxt preview",
     "lint": "eslint .",
     "format": "eslint . --fix",
-    "deploy:deno": "echo "
+    "deploy:deno": "mv .output ../../"
   },
   "dependencies": {
     "nuxt": "catalog:"
