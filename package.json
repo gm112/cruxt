@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "prepare": "cd ./layers/base/.nuxt || pnpm run --parallel dev:prepare"
+    "prepare": "bash -c '[ ! -d ./layers/base/.nuxt ] && pnpm run --parallel dev:prepare || true'"
   },
   "keywords": [],
   "author": "gm112",
