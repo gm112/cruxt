@@ -77,7 +77,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
-        path: ./projects/**/.output
+        path: ./projects/**/.output/*
         if-no-files-found: error
         overwrite: ${{ inputs.overwrite-build-artifacts }}
 
