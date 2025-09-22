@@ -2,6 +2,12 @@
   "name": "nuxt-v4-mobile-app-with-auth",
   "type": "module",
   "private": true,
+  "config": {
+    "environments": ["development"],
+    "tags": ["internal"],
+    "database_type": "postgresql",
+    "cloud_provider": "linode-standalone"
+  },
   "scripts": {
     "prepare": "nuxt prepare",
     "build": "nuxt build",

@@ -4,14 +4,16 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "prepare": "bash -c '[ ! -d ./layers/base/.nuxt ] && pnpm workspace:generate-tsconfig-project-references && pnpm run --parallel dev:prepare || true' && bash -c '[ ! -f ./shared/localhost/localhost.pem ] && [ -z $DENO_DEPLOY ] && pnpm run workspace:generate-certs || true'",
+    "prepare": "pnpm workspace:setup:all",
     "playground": "pnpm run --filter=nuxt-v4-mobile-app-with-auth dev",
     "test:all": "pnpm run --parallel test",
     "format:all": "pnpm run --parallel format",
     "lint:all": "pnpm run --parallel lint",
     "deploy:deno:project": "NUXT_PUBLIC_I18N_BASE_URL=/ pnpm run --filter=$PROJECT_NAME build && pnpm run --filter=$PROJECT_NAME deploy:deno",
-    "workspace:generate-certs": "bash -c 'command -v mkcert && cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1' || true",
-    "workspace:generate-tsconfig-project-references": "bash ./scripts/update-tsconfig.sh"
+    "workspace:setup:all": "bash ./scripts/pnpm-workspace/workspace-setup-all.sh",
+    "workspace:setup:generate-certs": "cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1'",
+    "workspace:setup:generate-tsconfig-project-references": "bash ./scripts/pnpm-workspace/update-tsconfig.sh",
+    "workspace:setup:generate-tfvars": "bash ./scripts/terraform/generate-tfvars.sh"
   },
   "keywords": [],
   "author": "gm112",
