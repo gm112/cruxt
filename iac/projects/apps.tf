@@ -2,7 +2,7 @@ module "app" {
   for_each                  = var.projects
   source                    = "../module"
   project_name              = each.value.name
-  project_repository_url    = each.value.repository_url
+  project_repository_url    = each.value.repository_url ? each.value.repository_url : var.github_repository_url
   project_repository_branch = var.github_branch
   project_cloud_provider    = each.value.cloud_provider
   project_environments      = each.value.environments

@@ -1,14 +1,3 @@
-variable "deno_deploy_api_token" {
-  type        = string
-  description = "The API token to use for authentication with the Deno Deploy API."
-  sensitive   = true
-}
-
-variable "deno_deploy_organization_id" {
-  type        = string
-  description = "The organization ID to use for authentication with the Deno Deploy API."
-}
-
 variable "project_name" {
   type        = string
   description = "The name of the project to deploy."

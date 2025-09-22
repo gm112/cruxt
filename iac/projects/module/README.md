@@ -73,3 +73,20 @@ Environment variables to set.
 The cloud provider to use.
 
 Currently only `linode-standalone` is works, the rest are in development still.
+
+#### `deno-deploy` implementation status [DOESNT WORK]
+
+- Seems to work with deno deploy legacy? Need to investigate.
+- Only creates a project. Does not deploy.
+
+#### `linode-standalone` implementation status [WORKS]
+
+- Works
+
+#### `aws-amplify` implementation status [REFACTORING]
+
+- Needs to be refactored to use project_environments.
+
+#### `cloudflare-pages` implementation status [REFACTORING]
+
+- Needs to be refactored to use project_environments.

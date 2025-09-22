@@ -7,7 +7,7 @@ This workspace manages the infrastructure for the projects in this pnpm workspac
 To deploy a project, add a new entry to the `projects` variable in `terraform.tfvars`. The entry should be a map with the following keys:
 
 - `name`: The name of the project to deploy.
-- `repository_url`: The URL of the repository to deploy.
+- `repository_url`: The URL of the repository to deploy. If not set, the `GITHUB_REPOSITORY_URL` environment variable will be used as a fallback.
 - `environments`: The environments to deploy to.
 - `tags`: The tags to apply to the project.
 - `database_type`: The type of database to use.
@@ -32,6 +32,23 @@ projects = {
 }
 ```
 
+or
+
+```terraform
+projects = {
+  "nuxt-v4-mobile-app-with-auth" = {
+    name           = "nuxt-v4-mobile-app-with-auth"
+    environments   = ["development"]
+    tags           = ["internal"]
+    database_type  = "postgresql"
+    env_vars       = {}
+    cloud_provider = "linode-standalone"
+  }
+}
+
+github_repository_url = "https://github.com/gm112/cruxt"
+```
+
 ## Inputs
 
 ### `projects`
@@ -41,3 +58,29 @@ projects = {
 **Type:** `map(object({ name = string, repository_url = string, environments = list(string), tags = list(string), database_type = string, env_vars = map(string), cloud_provider = string }))`
 
 The projects to deploy.
+
+## Environment Variables
+
+### `GITHUB_REPOSITORY_URL`
+
+**Required:** `true`
+
+**Type:** `string`
+
+The URL of the repository to deploy. Used as a fallback if `project_repository_url` is not set.
+
+### `LINODE_TOKEN`
+
+**Required:** `false`
+
+**Type:** `string`
+
+The Linode API token.
+
+### `CLOUDFLARE_API_TOKEN`
+
+**Required:** `false`
+
+**Type:** `string`
+
+The Cloudflare API token.
