@@ -4,6 +4,10 @@ This workspace manages the infrastructure for the projects in this pnpm workspac
 
 ## Usage
 
+The [terraform.tfvars](./terraform.tfvars) file is the main configuration file for the workspace. It contains the projects to deploy and the cloud providers to use. The tfvars file gets generated automatically by the [generate-tfvars.sh](../../scripts/terraform/generate-tfvars.sh) script, which is ran when `pnpm install` is run thanks to the `prepare` script in the [package.json](../../package.json) file. Refer to the [scripts](../../scripts/README.md#terraformgenerate-tfvarssh) folder for more information.
+
+### Variables
+
 To deploy a project, add a new entry to the `projects` variable in `terraform.tfvars`. The entry should be a map with the following keys:
 
 - `name`: The name of the project to deploy.
