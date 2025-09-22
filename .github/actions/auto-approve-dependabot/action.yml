@@ -1,0 +1,21 @@
+name: 'Auto approve dependabot PRs'
+description: 'Automatically approve dependabot PRs'
+runs:
+  using: 'composite'
+  steps:
+    - name: Fetch dependabot metadata
+      id: dependabot-metadata
+      uses: dependabot/fetch-metadata@v2
+      with:
+        github-token: "${{ github.token }}"
+        alert-lookup: true
+        compat-lookup: true
+
+    - name: Auto approve dependabot PRs
+      if: github.event.pull_request.user.login == 'dependabot[bot]'
+      shell: bash
+      run: |
+        gh pr review --approve "$PR_URL"
+      env:
+        PR_URL: ${{github.event.pull_request.html_url}}
+        GITHUB_TOKEN: ${{github.token}}

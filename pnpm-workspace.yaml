@@ -1,0 +1,16 @@
+packages:
+  - layers/*
+  - templates/*
+
+catalog:
+  '@nuxt/eslint': 1.9.0
+  '@nuxt/ui': 3.3.4
+  eslint: ^9.36.0
+  nuxt: ^4.1.2
+  tailwindcss: ^4.1.13
+  typescript: ^5.9.2
+  vue: ^3.5.21
+  vue-router: ^4.5.1
+  vue-tsc: ^3.0.7
+
+catalogMode: strict
