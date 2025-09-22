@@ -1,5 +1,18 @@
 name: 'Build pnpm workspace'
 description: 'Runs pnpm install, lints, and builds the project'
+inputs:
+  upload-coverage:
+    description: 'Upload coverage reports to Codecov'
+    required: false
+    default: 'false'
+  upload-build-artifacts:
+    description: 'Upload build artifacts to GitHub'
+    required: false
+    default: 'false'
+  overwrite-build-artifacts:
+    description: 'Overwrite existing build artifacts'
+    required: false
+    default: 'false'
 runs:
   using: 'composite'
   steps:
@@ -48,3 +61,24 @@ runs:
     - name: Test Projects
       shell: bash
       run: echo "Testing Projects" && pnpm run --parallel test
+
+    # - name: Retrieve Build Artifacts
+    #   if: inputs.upload-build-artifacts == 'true'
+    #   shell: bash
+    #   run: |
+    #     echo "Grabbing Build Artifacts"
+
+    #     mkdir -p ./.output
+    #     # Move all .output directories in the projects/{project-name} directories in ./projects/, using the project folder name as a parent folder name in ./.output/.
+    #     find ./projects -mindepth 1 -maxdepth 1 -type d -exec bash -c 'mv "$1"/.output "$1"/../' {} \;
+
+    - name: Upload Build Artifacts
+      if: inputs.upload-build-artifacts == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: ./projects/**/.output
+        if-no-files-found: error
+        overwrite: ${{ inputs.overwrite-build-artifacts }}
+
+
