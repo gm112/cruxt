@@ -31,8 +31,8 @@ variable "project_database_type" {
   default     = "none"
 
   validation {
-    condition     = contains(["postgresql", "supabase", "none"], var.project_database_type)
-    error_message = "Database type must be one of: postgresql, supabase, none."
+    condition     = contains(["postgresql", "supabase", "postgresql-k8s", "none"], var.project_database_type)
+    error_message = "Database type must be one of: postgresql, postgresql-k8s, supabase, none."
   }
 }
 

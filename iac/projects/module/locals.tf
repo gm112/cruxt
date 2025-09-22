@@ -41,7 +41,7 @@ locals {
   provider_supported_database_types = {
     "deno-deploy"       = ["none"]
     "linode-standalone" = ["postgresql", "supabase", "none"]
-    "aws-amplify"       = ["none"]
+    "aws-amplify"       = ["postgresql", "supabase", "postgresql-k8s", "none"]
     "cloudflare-pages"  = ["none"]
   }
 

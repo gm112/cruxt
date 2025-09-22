@@ -1,6 +1,6 @@
 # Documentation can be found at file://./README.md
 module "app" {
-  for_each                  = var.projects
+  for_each = var.projects
   # Documentation can be found at file://./module/README.md
   source                    = "../module"
   project_name              = each.value.name

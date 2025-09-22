@@ -1,14 +1,13 @@
-# resource "random_password" "project_database_password" {
-#   count   = var.project_database_type == "postgresql" ? length(var.project_environments) : 0
-#   length  = 32
-#   special = true
-# }
+resource "random_password" "project_database_password" {
+  length  = 32
+  special = true
+}
 
-resource "supabase_project" "test" {
-  organization_id   = locals.supabase_organization_id
+resource "supabase_project" "project" {
+  organization_id   = var.supabase_organization_id
   name              = var.project_name
-  database_password = "bar"
-  region            = "us-east-1"
+  database_password = random_password.project_database_password.result
+  region            = locals.project_environment_regions["production"]
   instance_size     = "micro"
 
   lifecycle {
@@ -19,7 +18,9 @@ resource "supabase_project" "test" {
   }
 }
 
-resource "supabase_branch" "new" {
-  parent_project_ref = "mayuaycdtijbctgqbycg"
-  git_branch         = "main"
+resource "supabase_branch" "branch" {
+  for_each           = toset(var.project_environments)
+  parent_project_ref = supabase_project.project.id
+  git_branch         = each.key
+  region             = local.project_environment_regions[each.key]
 }

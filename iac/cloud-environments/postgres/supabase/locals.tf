@@ -1,3 +1,7 @@
 locals {
-  supabase_organization_id = env("SUPABASE_ORGANIZATION_ID")
+  project_environment_regions = {
+    development = "us-east-1"
+    staging     = "us-east-1"
+    production  = "us-east-1"
+  }
 }

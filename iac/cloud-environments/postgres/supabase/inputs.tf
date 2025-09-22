@@ -20,3 +20,26 @@ variable "project_tags" {
   default     = []
 }
 
+variable "supabase_access_token" {
+  type        = optional(string)
+  description = "The Supabase access token."
+  sensitive   = true
+  default     = env("SUPABASE_ACCESS_TOKEN")
+
+  validation {
+    condition     = length(var.supabase_access_token) > 0
+    error_message = "Supabase access token must be set."
+  }
+}
+
+variable "supabase_organization_id" {
+  type        = optional(string)
+  description = "The Supabase organization ID."
+  sensitive   = true
+  default     = env("SUPABASE_ORGANIZATION_ID")
+
+  validation {
+    condition     = length(var.supabase_organization_id) > 0
+    error_message = "Supabase organization ID must be set."
+  }
+}
