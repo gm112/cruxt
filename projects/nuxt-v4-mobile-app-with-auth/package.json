@@ -13,6 +13,22 @@
     "nuxt": "catalog:"
   },
   "devDependencies": {
-    "@cruxt/base": "workspace:*"
+    "@capacitor/android": "catalog:",
+    "@capacitor/assets": "catalog:",
+    "@capacitor/cli": "catalog:",
+    "@capacitor/core": "catalog:",
+    "@capacitor/dialog": "catalog:",
+    "@capacitor/geolocation": "catalog:",
+    "@capacitor/google-maps": "catalog:",
+    "@capacitor/ios": "catalog:",
+    "@capacitor/local-notifications": "catalog:",
+    "@capacitor/preferences": "catalog:",
+    "@capacitor/push-notifications": "catalog:",
+    "@capacitor/splash-screen": "catalog:",
+    "@capacitor/toast": "catalog:",
+    "@cruxt/base": "workspace:*",
+    "@transistorsoft/capacitor-background-fetch": "catalog:",
+    "@transistorsoft/capacitor-background-geolocation": "catalog:",
+    "@trapezedev/project": "catalog:"
   }
 }

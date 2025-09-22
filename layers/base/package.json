@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./nuxt.config.ts",
   "scripts": {
-    "prepare": "nuxt prepare",
+    "dev:prepare": "nuxt prepare",
     "lint": "eslint .",
     "format": "eslint . --fix"
   },
@@ -13,8 +13,16 @@
   "author": "gm112",
   "license": "MPL-2.0",
   "dependencies": {
+    "@nuxt/fonts": "catalog:",
+    "@nuxt/icon": "catalog:",
+    "@nuxt/kit": "catalog:",
+    "@nuxt/scripts": "catalog:",
+    "@nuxt/test-utils": "catalog:",
     "@nuxt/ui": "catalog:",
-    "nuxt": "catalog:"
+    "@nuxtjs/i18n": "catalog:",
+    "@unhead/vue": "catalog:",
+    "nuxt": "catalog:",
+    "vue": "catalog:"
   },
   "devDependencies": {
     "@nuxt/eslint": "catalog:",
