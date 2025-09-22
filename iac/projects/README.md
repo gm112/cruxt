@@ -84,3 +84,9 @@ The Linode API token.
 **Type:** `string`
 
 The Cloudflare API token.
+
+## Developemnt Notes/Ideas/TODO
+
+- [ ] Add a script that can scan the .tfvars and the `git_repository_url` and automatically generate the `projects` variable.
+- [ ] Update it so that the projects themselves can configure the deployments, so the script that scans the folders can manage the .tfvars without input from a user.
+- [ ] Add docker support to the nuxt project. We can use this to create a standalone provider that deploys to a kubernetes cluster, for an on-prem or custom cloud deployment.

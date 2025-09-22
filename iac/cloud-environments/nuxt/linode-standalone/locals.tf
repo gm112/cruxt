@@ -11,11 +11,11 @@ locals {
   }
 
   # Default regions
-  default_regions = ["us-central", "us-east", "eu-west"]
+  default_regions = ["us-central"]
 
   # Regions per environment
   environment_regions = {
-    production  = ["us-southeast", "us-east", "eu-west"]
+    production  = ["us-southeast", "us-east"]
     staging     = local.default_regions
     development = local.default_regions
   }
