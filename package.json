@@ -9,8 +9,8 @@
     "test:all": "pnpm run --parallel test",
     "format:all": "pnpm run --parallel format",
     "lint:all": "pnpm run --parallel lint",
-    "deploy:deno:project": "NUXT_PUBLIC_I18N_BASE_URL=/ pnpm run --filter=nuxt-v4-mobile-app-with-auth build && pnpm run --filter=nuxt-v4-mobile-app-with-auth deploy:deno",
-    "workspace:generate-certs": "bash -c 'command -v mkcert && cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1'"
+    "deploy:deno:project": "NUXT_PUBLIC_I18N_BASE_URL=/ pnpm run --filter=$PROJECT_NAME build && pnpm run --filter=$PROJECT_NAME deploy:deno",
+    "workspace:generate-certs": "bash -c 'command -v mkcert && cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1' || true"
   },
   "keywords": [],
   "author": "gm112",
