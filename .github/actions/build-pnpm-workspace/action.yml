@@ -33,11 +33,11 @@ runs:
 
         COREPACK_EXISTS=$(command -v corepack)
         PNPM_RUNTIME_VERSION="pnpm@$(pnpm --version | cut -d' ' -f3)"
-        PACKAGE_JSON_PACKAGE_MANAGER_VERSION=$(cat package.json | grep -o '"packageManager":\s*"[^"]*"' | cut -d'"' -f3)
+        PACKAGE_JSON_PACKAGE_MANAGER_VERSION=$(cat package.json | grep -o '"packageManager":\s*"[^"]*"' | cut -d'"' -f4)
         PACKAGE_JSON_PNPM_VERSION=$(echo $PACKAGE_JSON_PACKAGE_MANAGER_VERSION | cut -d'+' -f1)
 
         PNPM_RUNTIME_MATCHES_PACKAGE_JSON=$([[ $PNPM_RUNTIME_VERSION == $PACKAGE_JSON_PNPM_VERSION ]] && echo true || echo false)
-        if [ ! -z "$COREPACK_EXISTS" ] || [ $PNPM_RUNTIME_MATCHES_PACKAGE_JSON == "false" ]; then
+        if [ ! "$COREPACK_EXISTS" ] || [ $PNPM_RUNTIME_MATCHES_PACKAGE_JSON == "false" ]; then
           echo "Updating corepack"
           npm install -g corepack@latest
         fi
