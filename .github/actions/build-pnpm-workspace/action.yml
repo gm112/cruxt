@@ -28,5 +28,6 @@ runs:
       shell: bash
       run: pnpm run --parallel build
 
-    - name: Check if run is triggered by dependabot
-      uses: ./.github/actions/auto-approve-dependabot
+    - name: Test Projects
+      shell: bash
+      run: pnpm run --parallel test
