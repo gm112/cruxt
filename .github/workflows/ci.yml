@@ -1,5 +1,18 @@
 name: CI
-on: [pull_request, pull_request_target]
+on:
+  pull_request:
+    branches:
+      - main
+  pull_request_target:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs: {}
+
+
+permissions:
+  contents: read
 
 jobs:
     build:
