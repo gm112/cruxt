@@ -19,7 +19,7 @@
     "workspace:setup:generate-certs": "cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1'",
     "workspace:setup:generate-tsconfig-project-references": "bash ./scripts/pnpm-workspace/update-tsconfig.sh",
     "workspace:setup:generate-tfvars": "bash ./scripts/terraform/generate-tfvars.sh",
-    "cloc": "pnpm dlx cloc --vcs git . --exclude-list-file=pnpm-lock.yaml"
+    "cloc": "pnpm dlx cloc --vcs git . --exclude-list-file=pnpm-lock.yaml --exclude-lang=JSON,INI,Text,YAML"
   },
   "keywords": [],
   "author": "gm112",
