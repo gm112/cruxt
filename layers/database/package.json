@@ -6,6 +6,7 @@
   "main": "./nuxt.config.ts",
   "scripts": {
     "dev:prepare": "nuxt prepare && nuxt prepare .playground",
+    "dev:db:generate": "cd .playground && drizzle-kit generate",
     "dev": "nuxt dev .playground",
     "lint": "eslint .",
     "format": "eslint . --fix"
@@ -16,8 +17,10 @@
   "dependencies": {
     "@cruxt/ui": "workspace:*",
     "drizzle-orm": "catalog:",
+    "drizzle-valibot": "catalog:",
     "nuxt": "catalog:",
-    "pg": "catalog:"
+    "pg": "catalog:",
+    "valibot": "catalog:"
   },
   "devDependencies": {
     "@types/pg": "catalog:",
