@@ -1,3 +1,8 @@
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const current_dir = dirname(fileURLToPath(import.meta.url))
+
 export default defineNuxtConfig({
   extends: ['@cruxt/base'],
   modules: [
@@ -7,6 +12,7 @@ export default defineNuxtConfig({
   $meta: {
     name: '@cruxt/ui',
   },
+  css: [join(current_dir, './app/assets/css/main.css')],
   i18n: {
     defaultLocale: 'en',
     locales: [

@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "pages": {
+      "login": {
+        "title": "Login",
+        "description": "Login to your account"
+      }
+    }
+  }
+}

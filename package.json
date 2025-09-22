@@ -4,7 +4,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "prepare": "bash -c '[ ! -d ./layers/base/.nuxt ] && pnpm run --parallel dev:prepare || true'"
+    "prepare": "bash -c '[ ! -d ./layers/base/.nuxt ] && pnpm run --parallel dev:prepare || true' && bash -c '[ ! -f ./shared/localhost/localhost.pem ] && pnpm run workspace:generate-certs || true'",
+    "workspace:generate-certs": "command -v mkcert && cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1"
   },
   "keywords": [],
   "author": "gm112",

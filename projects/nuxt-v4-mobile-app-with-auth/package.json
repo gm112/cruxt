@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "nuxt prepare",
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --https",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "lint": "eslint .",
