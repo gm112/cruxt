@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+workspace_root_package_json="$(realpath "$(dirname "$0")/../../package.json")"
+
 fake_jq_get_value_from_json() {
   local json_file="$1"
   local key="$2"
@@ -43,7 +45,12 @@ fake_jq_get_value_from_json() {
 generate_tfvars() {
   local project_dir="$(realpath "$1")"
   local tfvars_file="$(realpath "$2")"
-  local default_github_repository_url="$3"
+  local default_github_repository_url=$(fake_jq_get_value_from_json "$workspace_root_package_json" "repository.url" "$3")
+
+  if [ -z "$default_github_repository_url" ]; then
+    echo "Could not find default github repository url in $workspace_root_package_json. Please set it manually."
+    exit 1
+  fi
 
   found_projects=($(find "$project_dir" -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' dir; do
     echo "$dir"
@@ -90,4 +97,4 @@ EOF
   echo "Generated new tfvars file: $tfvars_file"
 }
 
-generate_tfvars "./projects" "./iac/projects/terraform.tfvars" "https://github.com/gm112/cruxt"
+generate_tfvars "./projects" "./iac/projects/terraform.tfvars"

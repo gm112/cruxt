@@ -4,6 +4,10 @@
   "description": "",
   "type": "module",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gm112/cruxt"
+  },
   "scripts": {
     "prepare": "pnpm workspace:setup:all",
     "playground": "pnpm run --filter=nuxt-v4-mobile-app-with-auth dev",
