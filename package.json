@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "prepare": "cd ./layers/base/.nuxt || pnpm run --parallel dev:prepare"
+  },
   "keywords": [],
   "author": "gm112",
   "license": "MPL-2.0",

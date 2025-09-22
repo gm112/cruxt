@@ -13,6 +13,9 @@
     "nuxt": "catalog:"
   },
   "devDependencies": {
+    "@nuxt/eslint": "catalog:",
+    "@cruxt/auth": "workspace:*",
+    "eslint": "catalog:",
     "@capacitor/android": "catalog:",
     "@capacitor/assets": "catalog:",
     "@capacitor/cli": "catalog:",
@@ -26,7 +29,6 @@
     "@capacitor/push-notifications": "catalog:",
     "@capacitor/splash-screen": "catalog:",
     "@capacitor/toast": "catalog:",
-    "@cruxt/auth": "workspace:*",
     "@transistorsoft/capacitor-background-fetch": "catalog:",
     "@transistorsoft/capacitor-background-geolocation": "catalog:",
     "@trapezedev/project": "catalog:"

@@ -14,6 +14,8 @@
   "author": "gm112",
   "license": "MPL-2.0",
   "dependencies": {
+    "nuxt": "catalog:",
+    "@cruxt/base": "workspace:*",
     "@nuxt/fonts": "catalog:",
     "@nuxt/icon": "catalog:",
     "@nuxt/ui": "catalog:",
@@ -21,9 +23,6 @@
   },
   "devDependencies": {
     "tailwindcss": "catalog:",
-    "@nuxt/eslint": "catalog:",
-    "eslint": "catalog:",
-    "nuxt": "catalog:",
-    "@cruxt/base": "workspace:*"
+    "eslint": "catalog:"
   }
 }

@@ -29,6 +29,7 @@
     "eslint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
+    "vite-plugin-eslint2": "catalog:",
     "vue-tsc": "catalog:"
   }
 }

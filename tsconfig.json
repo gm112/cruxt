@@ -1,0 +1,18 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./layers/base"
+    },
+    {
+      "path": "./layers/ui"
+    },
+    {
+      "path": "./layers/auth"
+    },
+    {
+      // This is a playground project
+      "path": "./projects/nuxt-v4-mobile-app-with-auth"
+    }
+  ]
+}

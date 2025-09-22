@@ -13,11 +13,10 @@
   "author": "gm112",
   "license": "MPL-2.0",
   "dependencies": {
+    "nuxt": "catalog:",
     "@cruxt/ui": "workspace:*"
   },
   "devDependencies": {
-    "@nuxt/eslint": "catalog:",
-    "eslint": "catalog:",
-    "nuxt": "catalog:"
+    "eslint": "catalog:"
   }
 }

@@ -32,4 +32,9 @@ export default defineNuxtConfig({
       exclude: ['**/ios/**', '**/android/**', '**/windows/**', '**/dist/**'],
     },
   },
+  eslint: {
+    config: {
+      stylistic: true,
+    }
+  }
 })
