@@ -4,7 +4,7 @@ set -e
 TSCONFIG="tsconfig.json"
 
 # Generate new references array without trailing comma
-refs=$(find ./{projects,layers} -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' dir; do
+refs=$(find ./{projects,layers,modules} -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' dir; do
   echo "{ \"path\": \"$dir\" }"
 done)
 

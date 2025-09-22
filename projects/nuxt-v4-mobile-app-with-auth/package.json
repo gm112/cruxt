@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@cruxt/auth": "workspace:*",
+    "@cruxt/nuxt-module-capacitor": "workspace:*",
     "@capacitor/android": "catalog:",
     "@capacitor/assets": "catalog:",
     "@capacitor/cli": "catalog:",
