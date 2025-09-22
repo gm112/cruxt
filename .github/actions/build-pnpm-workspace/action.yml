@@ -16,7 +16,7 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        COREPACK_EXISTS=command -v corepack
+        COREPACK_EXISTS=$(command -v corepack)
         PNPM_RUNTIME_VERSION="pnpm@$(pnpm --version | cut -d' ' -f3)"
         PACKAGE_JSON_PACKAGE_MANAGER_VERSION=$(cat package.json | grep -o '"packageManager":\s*"[^"]*"' | cut -d'"' -f3)
         PACKAGE_JSON_PNPM_VERSION=$(echo $PACKAGE_JSON_PACKAGE_MANAGER_VERSION | cut -d'+' -f1)
