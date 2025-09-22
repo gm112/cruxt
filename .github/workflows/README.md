@@ -2,7 +2,7 @@
 
 ## [ci.yml](./ci.yml)
 
-This workflow is responsible for building the project and running linting and tests.
+This workflow is responsible for building the project and running linting and tests. It will also automatically approve dependabot PRs.
 
 It is triggered on pushes to the `main` branch and on pull requests to the `main` branch.
 
