@@ -14,13 +14,40 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - '.github/workflows/ci.yml'
+      - '.github/actions/*'
+      - '.nvmrc'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - 'layers/*'
+      - 'projects/*'
   pull_request_target:
     branches:
       - main
+    paths:
+      - '.github/workflows/ci.yml'
+      - '.github/actions/*'
+      - '.nvmrc'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - 'layers/*'
+      - 'projects/*'
   push:
     branches:
       - main
-      
+    paths:
+      - '.github/workflows/ci.yml'
+      - '.github/actions/*'
+      - '.nvmrc'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - 'layers/*'
+      - 'projects/*'
+
 jobs:
   build:
     uses: cruxt/cruxt/.github/workflows/ci.yml@main
