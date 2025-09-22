@@ -4,11 +4,12 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "prepare": "bash -c '[ ! -d ./layers/base/.nuxt ] && pnpm run --parallel dev:prepare || true' && bash -c '[ ! -f ./shared/localhost/localhost.pem ] && pnpm run workspace:generate-certs || true'",
+    "prepare": "bash -c '[ ! -d ./layers/base/.nuxt ] && pnpm run --parallel dev:prepare || true' && bash -c '[ ! -f ./shared/localhost/localhost.pem ] && [ -z $DENO_DEPLOY ] && pnpm run workspace:generate-certs || true'",
     "playground": "pnpm run --filter=nuxt-app dev",
     "test:all": "pnpm run --parallel test",
     "format:all": "pnpm run --parallel format",
-    "deploy:deno": "cd ./projects/nuxt-v4-mobile-app-with-auth && pnpm run build && mv .output ../../",
+    "lint:all": "pnpm run --parallel lint",
+    "deploy:deno:project": "pnpm run --filter=$DENO_DEPLOY_APP_SLUG build && pnpm run --filter=$DENO_DEPLOY_APP_SLUG deploy:deno",
     "workspace:generate-certs": "command -v mkcert && cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1"
   },
   "keywords": [],

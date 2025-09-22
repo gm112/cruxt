@@ -9,7 +9,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "lint": "eslint .",
-    "format": "eslint . --fix"
+    "format": "eslint . --fix",
+    "deploy:deno": "mv .output ../../"
   },
   "dependencies": {
     "nuxt": "catalog:"
