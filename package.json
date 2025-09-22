@@ -9,7 +9,7 @@
     "test:all": "pnpm run --parallel test",
     "format:all": "pnpm run --parallel format",
     "lint:all": "pnpm run --parallel lint",
-    "deploy:deno:project": "pnpm run --filter=$DENO_DEPLOY_APP_SLUG build  && pnpm run --filter=$DENO_DEPLOY_APP_SLUG deploy:deno && ls -la ./ && ls -la ./.output || ls -la ./projects/$DENO_DEPLOY_APP_SLUG",
+    "deploy:deno:project": "echo '$DENO_DEPLOY_APP_SLUG' && pnpm run --filter=$(echo $DENO_DEPLOY_APP_SLUG) build  && pnpm run --filter=$(echo $DENO_DEPLOY_APP_SLUG deploy:deno) && ls -la ./ && ls -la ./.output || ls -la ./projects/$DENO_DEPLOY_APP_SLUG",
     "workspace:generate-certs": "bash -c 'command -v mkcert && cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1'"
   },
   "keywords": [],
