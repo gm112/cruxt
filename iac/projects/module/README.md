@@ -68,31 +68,9 @@ Environment variables to set.
 
 **Type:** `string`
 
-**Values:** `deno-deploy`, `linode-standalone`, `aws-amplify`, `cloudflare-pages`
+**Values:** `deno-deploy`, `linode-standalone`, `kubernetes-k8s`, `aws-amplify`, `cloudflare-pages`
 
 The cloud provider to use.
-
-Currently only `linode-standalone` is works, the rest are in development still.
-
-#### `deno-deploy` implementation status [DOESNT WORK]
-
-- Seems to work with deno deploy legacy? Need to investigate.
-- Only creates a project. Does not deploy.
-- Doesnt support postgres or supabase yet.
-
-#### `linode-standalone` implementation status [WORKS]
-
-- Works
-
-#### `aws-amplify` implementation status [REFACTORING]
-
-- Needs to be refactored to use project_environments.
-- Doesnt support postgres or supabase yet.
-
-#### `cloudflare-pages` implementation status [REFACTORING]
-
-- Needs to be refactored to use project_environments.
-- Doesnt support postgres or supabase yet.
 
 ## Adding a new postgres provider
 

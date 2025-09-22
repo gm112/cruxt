@@ -5,6 +5,11 @@ terraform {
       source  = "linode/linode"
       version = "3.3.0"
     }
+
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "3.6.2"
+    }
   }
 }
 

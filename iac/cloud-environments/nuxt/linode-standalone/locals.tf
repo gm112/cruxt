@@ -31,10 +31,4 @@ locals {
     for env in var.project_environments :
     env => lookup(local.environment_regions, env, local.default_regions)
   }
-
-  # Compute Docker image path per environment
-  project_environment_docker_paths = {
-    for env in var.project_environments :
-    env => "docker_images/${var.project_name}/${env}/image.tar"
-  }
 }
