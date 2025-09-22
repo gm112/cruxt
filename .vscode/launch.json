@@ -1,0 +1,53 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "server: nuxt",
+      "outputCapture": "std",
+      "program": "${workspaceFolder}/node_modules/nuxt/bin/nuxt.mjs",
+      "args": [
+        "dev",
+        "--cwd",
+        "${workspaceFolder}/projects/nuxt-v4-mobile-app-with-auth",
+        "--port",
+        "3000",
+        "--https"
+      ],
+      "preLaunchTask": "pnpm install",
+      "postDebugTask": "cleanup-server",
+      "cascadeTerminateToConfigurations": ["server: next", "Browser Debug"],
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**",
+        "**/.nuxt/**",
+        "**/.output/**",
+        "**/dist/**",
+        "**/.pnpm-store/**"
+      ],
+      "presentation": {
+        "hidden": true,
+        "group": "build",
+        "order": 2
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": ".*://localhost:(\\d*).*",
+        "uriFormat": "https://localhost:%s",
+        "webRoot": "${workspaceFolder}",
+        "killOnServerStop": true
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "fullstack: nuxt",
+      "configurations": ["server: nuxt"],
+      "stopAll": true,
+      "postDebugTask": "cleanup-server"
+    }
+  ]
+}

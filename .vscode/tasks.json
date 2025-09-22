@@ -1,0 +1,128 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "wait-for-server",
+      "type": "shell",
+      "command": "corepack pnpm dlx wait-on tcp:3000",
+      "problemMatcher": [],
+      "group": { "kind": "build" },
+      "icon": {
+        "color": "terminal.ansiBlue",
+        "id": "squirrel"
+      },
+      "presentation": {
+        "group": "build",
+        "reveal": "never",
+        "close": true,
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "runOptions": {
+        "instanceLimit": 1,
+        "instancePolicy": "silent"
+      }
+    },
+    {
+      "label": "cleanup-server",
+      "type": "shell",
+      "command": "(corepack pnpm dlx kill-port-process 3000 > /dev/null 2>&1) || true",
+      "windows": {
+        "command": "cmd",
+        "args": [
+          "/c",
+          "corepack pnpm dlx kill-port-process 3000 > NUL 2>&1 || exit 0"
+        ]
+      },
+      "problemMatcher": [],
+      "group": { "kind": "build" },
+      "icon": {
+        "color": "terminal.ansiBlue",
+        "id": "squirrel"
+      },
+      "presentation": {
+        "group": "build",
+        "reveal": "never",
+        "close": true,
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "runOptions": {
+        "instanceLimit": 1,
+        "instancePolicy": "silent"
+      }
+    },
+    {
+      "label": "pnpm install",
+      "type": "shell",
+      "command": "corepack enable && corepack pnpm install",
+      "problemMatcher": [],
+      "group": { "kind": "build" },
+      "icon": {
+        "color": "terminal.ansiBlue",
+        "id": "squirrel"
+      },
+      "presentation": {
+        "close": true,
+        "group": "build",
+        "reveal": "never",
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "runOptions": {
+        "instanceLimit": 1,
+        "instancePolicy": "terminateNewest"
+      }
+    },
+    {
+      "label": "pnpm build",
+      "type": "shell",
+      "command": "corepack pnpm build",
+      "problemMatcher": [],
+      "dependsOn": ["pnpm install"],
+      "group": {
+        "kind": "build"
+      },
+      "icon": {
+        "color": "terminal.ansiBlue",
+        "id": "squirrel"
+      },
+      "presentation": {
+        "clear": true,
+        "reveal": "never",
+        "panel": "shared",
+        "showReuseMessage": false,
+        "close": true
+      },
+      "runOptions": {
+        "instanceLimit": 1,
+        "instancePolicy": "terminateNewest"
+      }
+    },
+    {
+      "label": "pnpm build --mode=production",
+      "type": "shell",
+      "command": "corepack pnpm build --mode=production",
+      "problemMatcher": [],
+      "dependsOn": ["pnpm install"],
+      "group": {
+        "kind": "build"
+      },
+      "icon": {
+        "color": "terminal.ansiBlue",
+        "id": "squirrel"
+      },
+      "presentation": {
+        "clear": true,
+        "reveal": "never",
+        "panel": "shared",
+        "showReuseMessage": false,
+        "close": true
+      },
+      "runOptions": {
+        "instanceLimit": 1,
+        "instancePolicy": "terminateNewest"
+      }
+    }
+  ]
+}

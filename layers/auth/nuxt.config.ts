@@ -1,11 +1,11 @@
 export default defineNuxtConfig({
-  extends: ['@cruxt/ui'],
+  extends: ['@cruxt/ui', '@cruxt/database'],
   $meta: {
     name: '@cruxt/auth',
   },
   i18n: {
     locales: [
-      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'en', name: 'English', file: 'en.json', language: 'en' },
     ],
   },
 })

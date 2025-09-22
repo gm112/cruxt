@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "nuxt prepare",
     "build": "nuxt build",
-    "dev": "nuxt dev --https",
+    "dev": "cp -f .env.example .env && nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "lint": "eslint .",
@@ -15,9 +15,7 @@
     "nuxt": "catalog:"
   },
   "devDependencies": {
-    "@nuxt/eslint": "catalog:",
     "@cruxt/auth": "workspace:*",
-    "eslint": "catalog:",
     "@capacitor/android": "catalog:",
     "@capacitor/assets": "catalog:",
     "@capacitor/cli": "catalog:",

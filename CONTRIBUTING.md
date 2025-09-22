@@ -46,11 +46,11 @@ Make your changes!
 ### Run the tests
 
 ```bash
-pnpm test
+pnpm test:all
 ```
 
 ### Format/lint the code before committing
 
 ```bash
-pnpm format
+pnpm format:all
 ```

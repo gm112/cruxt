@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@types/pg": "catalog:",
-    "drizzle-kit": "catalog:",
-    "eslint": "catalog:"
+    "drizzle-kit": "catalog:"
   }
 }

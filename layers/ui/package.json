@@ -22,7 +22,6 @@
     "@nuxtjs/i18n": "catalog:"
   },
   "devDependencies": {
-    "tailwindcss": "catalog:",
-    "eslint": "catalog:"
+    "tailwindcss": "catalog:"
   }
 }

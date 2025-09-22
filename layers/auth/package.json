@@ -14,9 +14,9 @@
   "license": "MPL-2.0",
   "dependencies": {
     "nuxt": "catalog:",
-    "@cruxt/ui": "workspace:*"
+    "@cruxt/ui": "workspace:*",
+    "@cruxt/database": "workspace:*"
   },
   "devDependencies": {
-    "eslint": "catalog:"
   }
 }
