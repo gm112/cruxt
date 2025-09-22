@@ -1,16 +1,16 @@
 export default defineNuxtConfig({
-  $meta: {
-    name: '@cruxt/base'
-  },
   modules: [
-    "@nuxt/eslint",
+    '@nuxt/eslint',
   ],
+  $meta: {
+    name: '@cruxt/base',
+  },
   devtools: { enabled: true },
-  compatibilityDate: '2025-09-21',
   future: {
     compatibilityVersion: 4,
     typescriptBundlerResolution: true,
   },
+  compatibilityDate: '2025-09-21',
   nitro: {
     experimental: {
       wasm: true,
@@ -35,6 +35,6 @@ export default defineNuxtConfig({
   eslint: {
     config: {
       stylistic: true,
-    }
-  }
+    },
+  },
 })

@@ -1,12 +1,12 @@
 export default defineNuxtConfig({
-  $meta: {
-    name: '@cruxt/ui'
-  },
   extends: ['@cruxt/base'],
   modules: [
-    "@nuxt/ui",
-    "@nuxtjs/i18n"
+    '@nuxt/ui',
+    '@nuxtjs/i18n',
   ],
+  $meta: {
+    name: '@cruxt/ui',
+  },
   i18n: {
     defaultLocale: 'en',
     locales: [
@@ -16,6 +16,6 @@ export default defineNuxtConfig({
       strictSeo: false,
       typedOptionsAndMessages: 'all',
       typedPages: true,
-    }
-  }
+    },
+  },
 })

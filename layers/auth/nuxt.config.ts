@@ -1,6 +1,6 @@
 export default defineNuxtConfig({
+  extends: ['@cruxt/ui'],
   $meta: {
-    name: '@cruxt/auth'
+    name: '@cruxt/auth',
   },
-  extends: ['@cruxt/ui']
 })
