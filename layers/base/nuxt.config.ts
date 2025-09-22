@@ -45,6 +45,13 @@ export default defineNuxtConfig({
       max: 4,
     },
   },
+  runtimeConfig: {
+    public: {
+      i18n: {
+        baseUrl: process.env.NUXT_PUBLIC_I18N_BASE_URL ?? '/',
+      },
+    },
+  },
   sourcemap: false,
   future: {
     compatibilityVersion: 4,
