@@ -1,0 +1,32 @@
+name: 'Build pnpm workspace'
+description: 'Runs pnpm install, lints, and builds the project'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        run_install: false
+    - name: Setup Node
+      uses: actions/setup-node@v5
+      with:
+        node-version-file: .nvmrc
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        npm install -g corepack@latest
+        corepack enable
+        pnpm install --frozen-lockfile
+
+    - name: Validate Code Formatting
+      shell: bash
+      run: pnpm run --parallel lint
+
+    - name: Build Projects
+      shell: bash
+      run: pnpm run --parallel build
+
+    - name: Check if run is triggered by dependabot
+      uses: ./.github/actions/auto-approve-dependabot
