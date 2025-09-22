@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "nuxt-v4-mobile-app-with-auth",
   "type": "module",
   "private": true,
   "scripts": {
