@@ -16,6 +16,8 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
+        echo "Verifying corepack and pnpm versions."
+
         COREPACK_EXISTS=$(command -v corepack)
         PNPM_RUNTIME_VERSION="pnpm@$(pnpm --version | cut -d' ' -f3)"
         PACKAGE_JSON_PACKAGE_MANAGER_VERSION=$(cat package.json | grep -o '"packageManager":\s*"[^"]*"' | cut -d'"' -f3)
@@ -23,19 +25,26 @@ runs:
 
         PNPM_RUNTIME_MATCHES_PACKAGE_JSON=$([[ $PNPM_RUNTIME_VERSION == $PACKAGE_JSON_PNPM_VERSION ]] && echo true || echo false)
         if [ ! -z "$COREPACK_EXISTS" ] || [ $PNPM_RUNTIME_MATCHES_PACKAGE_JSON == "false" ]; then
+          echo "Updating corepack"
           npm install -g corepack@latest
         fi
-        corepack enable
+
+        if [ $PNPM_RUNTIME_MATCHES_PACKAGE_JSON == "false" ]; then
+          echo "Setting up pnpm with corepack."
+          corepack enable
+        fi
+
+        echo "Installing dependencies"
         pnpm install --frozen-lockfile
 
     - name: Validate Code Formatting
       shell: bash
-      run: pnpm run --parallel lint
+      run: echo "Validating Code Formatting" && pnpm run --parallel lint
 
     - name: Build Projects
       shell: bash
-      run: pnpm run --parallel build
+      run: echo "Building Projects" && pnpm run --parallel build
 
     - name: Test Projects
       shell: bash
-      run: pnpm run --parallel test
+      run: echo "Testing Projects" && pnpm run --parallel test
