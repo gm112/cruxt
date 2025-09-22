@@ -33,4 +33,10 @@ variable "project_tags" {
 variable "project_database_type" {
   type        = string
   description = "The type of database to use."
+  default     = "none"
+
+  validation {
+    condition     = contains(["postgresql", "supabase", "none"], var.project_database_type)
+    error_message = "Database type must be one of: postgresql, supabase, none."
+  }
 }

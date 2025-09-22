@@ -37,4 +37,13 @@ locals {
     for env in var.project_environments :
     env => lookup(local.environment_branch_map, env, "develop")
   }
+
+  provider_supported_database_types = {
+    "deno-deploy"       = ["none"]
+    "linode-standalone" = ["postgresql", "supabase", "none"]
+    "aws-amplify"       = ["none"]
+    "cloudflare-pages"  = ["none"]
+  }
+
+  database_is_supported_by_provider = contains(local.provider_supported_database_types[var.project_cloud_provider], var.project_database_type)
 }

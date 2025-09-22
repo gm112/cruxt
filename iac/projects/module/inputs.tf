@@ -31,8 +31,8 @@ variable "project_database_type" {
   default     = "none"
 
   validation {
-    condition     = contains(["postgresql", "none"], var.project_database_type)
-    error_message = "Database type must be one of: postgresql, none."
+    condition     = contains(["postgresql", "supabase", "none"], var.project_database_type)
+    error_message = "Database type must be one of: postgresql, supabase, none."
   }
 }
 
@@ -48,5 +48,16 @@ variable "project_cloud_provider" {
   validation {
     condition     = contains(["deno-deploy", "linode-standalone", "aws-amplify", "cloudflare-pages"], var.project_cloud_provider)
     error_message = "Cloud provider must be one of: deno-deploy, linode-standalone, aws-amplify, cloudflare-pages."
+  }
+}
+
+variable "__internal__project_cloud_provider_validation__DO_NOT_SET" {
+  type        = bool
+  description = "Validates the cloud provider against the database type."
+  default     = local.database_is_supported_by_provider
+
+  validation {
+    condition     = var.__internal__project_cloud_provider_validation
+    error_message = "Cloud provider is not supported by the database type."
   }
 }

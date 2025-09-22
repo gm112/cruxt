@@ -48,7 +48,7 @@ The tags to apply to the project.
 
 **Type:** `string`
 
-**Values:** `postgresql`, `none`
+**Values:** `postgresql`, `supabase`, `none`
 
 **Default:** `none`
 
@@ -78,6 +78,7 @@ Currently only `linode-standalone` is works, the rest are in development still.
 
 - Seems to work with deno deploy legacy? Need to investigate.
 - Only creates a project. Does not deploy.
+- Doesnt support postgres or supabase yet.
 
 #### `linode-standalone` implementation status [WORKS]
 
@@ -86,7 +87,9 @@ Currently only `linode-standalone` is works, the rest are in development still.
 #### `aws-amplify` implementation status [REFACTORING]
 
 - Needs to be refactored to use project_environments.
+- Doesnt support postgres or supabase yet.
 
 #### `cloudflare-pages` implementation status [REFACTORING]
 
 - Needs to be refactored to use project_environments.
+- Doesnt support postgres or supabase yet.

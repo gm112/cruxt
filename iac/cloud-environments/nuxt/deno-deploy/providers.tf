@@ -5,6 +5,11 @@ terraform {
       source  = "denoland/deno"
       version = "0.1.0"
     }
+
+    supabase = {
+      source  = "supabase/supabase"
+      version = "1.5.1"
+    }
   }
 }
 
@@ -16,4 +21,8 @@ provider "deno" {
   # # Organization ID that this provider will interact with.
   # # If omitted, the organization ID will be read from the environment variable `DENO_DEPLOY_ORGANIZATION_ID`.
   # organization_id = var.deno_deploy_organization_id
+}
+
+provider "supabase" {
+  access_token = env("SUPABASE_ACCESS_TOKEN")
 }
