@@ -1,0 +1,22 @@
+{
+  "name": "@cruxt/auth",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "./nuxt.config.ts",
+  "scripts": {
+    "prepare": "nuxt prepare",
+    "lint": "eslint .",
+    "format": "eslint . --fix"
+  },
+  "keywords": [],
+  "author": "gm112",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "@cruxt/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "catalog:",
+    "eslint": "catalog:"
+  }
+}

@@ -3,11 +3,11 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "prepare": "nuxt prepare",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "preview": "nuxt preview"
   },
   "dependencies": {
     "nuxt": "catalog:"
@@ -26,7 +26,7 @@
     "@capacitor/push-notifications": "catalog:",
     "@capacitor/splash-screen": "catalog:",
     "@capacitor/toast": "catalog:",
-    "@cruxt/base": "workspace:*",
+    "@cruxt/auth": "workspace:*",
     "@transistorsoft/capacitor-background-fetch": "catalog:",
     "@transistorsoft/capacitor-background-geolocation": "catalog:",
     "@trapezedev/project": "catalog:"

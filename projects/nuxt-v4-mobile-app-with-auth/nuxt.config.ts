@@ -1,4 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  extends: ['@cruxt/base']
+  extends: ['@cruxt/auth']
 })
