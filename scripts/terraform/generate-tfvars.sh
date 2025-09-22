@@ -73,6 +73,11 @@ generate_tfvars() {
     tags=$(fake_jq_get_value_from_json "$project/package.json" "config.tags" "[]")
     database_type=$(fake_jq_get_value_from_json "$project/package.json" "config.database_type" "none")
 
+    if [ -z "$cloud_provider" ] || [ "$cloud_provider" = "none" ]; then
+      echo "Skipping $project because it doesn't have a cloud provider set."
+      continue
+    fi
+
     # Add quotes around the project name key to match your formatting
     cat >> "$tfvars_file" <<EOF
   "$project_name" = {

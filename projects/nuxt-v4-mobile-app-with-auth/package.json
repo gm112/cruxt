@@ -6,7 +6,7 @@
     "environments": ["development"],
     "tags": ["internal"],
     "database_type": "postgresql",
-    "cloud_provider": "linode-standalone"
+    "cloud_provider": "aws-amplify"
   },
   "scripts": {
     "prepare": "nuxt prepare",
