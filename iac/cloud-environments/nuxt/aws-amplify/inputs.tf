@@ -64,3 +64,17 @@ variable "supabase_organization_id" {
     error_message = "Supabase organization ID must be set."
   }
 }
+
+
+variable "source_terraform_modules_from_local" {
+  type        = bool
+  description = "Whether to use local terraform modules."
+  default     = true
+}
+
+variable "github_terraform_module_repository_personal_access_token" {
+  type        = string
+  description = "The personal access token for the github terraform module repository."
+  sensitive   = true
+  default     = env("GITHUB_ACCESS_TOKEN") ? env("GITHUB_ACCESS_TOKEN") : ""
+}

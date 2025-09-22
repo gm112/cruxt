@@ -1,6 +1,6 @@
 module "aws_database" {
   for_each = toset(var.project_database_type == "postgresql" ? var.project_environments : [])
-  source   = "../../postgres/aws"
+  source   = var.source_terraform_modules_from_local ? "../../postgres/aws" : "git::${local.github_repository_url}/iac/cloud-environments/postgres/aws?ref=${local.github_ref}"
   region   = local.environment_regions[each.key]
 
   name     = "${var.project_name}-${each.key}"
@@ -16,7 +16,7 @@ module "aws_database" {
 
 module "kubernetes_database" {
   for_each             = toset(var.project_database_type == "postgresql-k8s" ? var.project_environments : [])
-  source               = "../../postgres/kubernetes-k8s"
+  source               = var.source_terraform_modules_from_local ? "../../postgres/kubernetes-k8s" : "git::${local.github_repository_url}/iac/cloud-environments/postgres/kubernetes-k8s?ref=${local.github_ref}"
   kubernetes_namespace = var.project_name
 
   project_name = var.project_name
@@ -29,7 +29,7 @@ module "kubernetes_database" {
 
 module "supabase_database" {
   for_each = toset(var.project_database_type == "supabase" ? var.project_environments : [])
-  source   = "../../postgres/supabase"
+  source   = var.source_terraform_modules_from_local ? "../../postgres/supabase" : "git::${local.github_repository_url}/iac/cloud-environments/postgres/supabase?ref=${local.github_ref}"
 
   project_name = var.project_name
 

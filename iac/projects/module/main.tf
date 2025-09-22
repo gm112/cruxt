@@ -1,6 +1,6 @@
 module "project_deployment_environment" {
   for_each                  = toset(var.project_environments)
-  source                    = "../cloud-environments/${var.project_cloud_provider}"
+  source                    = var.source_terraform_modules_from_local ? "../../cloud-environments/${var.project_cloud_provider}" : "git::${locals.github_repository_url}/iac/cloud-environments/${var.project_cloud_provider}?ref=${local.github_ref}"
   project_environment       = each.key
   project_name              = var.project_name
   project_repository_url    = var.project_repository_url

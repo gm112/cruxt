@@ -37,4 +37,8 @@ locals {
     "staging"     = ["us-east-1a", "us-east-1b"]
     "development" = ["us-east-1a", "us-east-1b"]
   }
+
+
+  github_repository_url = "https://${length(github_terraform_module_repository_personal_access_token) > 0 ? "${github_terraform_module_repository_personal_access_token}@" : ""}github.com/gm112/cruxt.git"
+  github_ref            = "main"
 }

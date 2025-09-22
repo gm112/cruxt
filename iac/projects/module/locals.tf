@@ -46,4 +46,7 @@ locals {
   }
 
   database_is_supported_by_provider = contains(local.provider_supported_database_types[var.project_cloud_provider], var.project_database_type)
+
+  github_repository_url = "https://${length(github_terraform_module_repository_personal_access_token) > 0 ? "${github_terraform_module_repository_personal_access_token}@" : ""}github.com/gm112/cruxt.git"
+  github_ref            = "main"
 }
