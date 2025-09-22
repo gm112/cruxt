@@ -1,10 +1,10 @@
 packages:
   - layers/*
-  - templates/*
+  - projects/*
 
 catalog:
   '@nuxt/eslint': 1.9.0
-  '@nuxt/ui': 3.3.4
+  '@nuxt/ui': 4.0.0-alpha.2
   eslint: ^9.36.0
   nuxt: ^4.1.2
   tailwindcss: ^4.1.13
@@ -14,3 +14,7 @@ catalog:
   vue-tsc: ^3.0.7
 
 catalogMode: strict
+
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - vue-demi

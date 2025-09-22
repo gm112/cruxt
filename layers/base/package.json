@@ -5,7 +5,9 @@
   "type": "module",
   "main": "./nuxt.config.ts",
   "scripts": {
-    "prepare": "nuxt prepare"
+    "prepare": "nuxt prepare",
+    "lint": "eslint .",
+    "format": "eslint . --fix"
   },
   "keywords": [],
   "author": "gm112",
