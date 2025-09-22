@@ -6,7 +6,7 @@
     "environments": ["development"],
     "tags": ["internal"],
     "database_type": "postgresql",
-    "cloud_provider": "aws-amplify"
+    "cloud_provider": "none"
   },
   "scripts": {
     "prepare": "nuxt prepare",
