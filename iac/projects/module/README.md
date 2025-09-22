@@ -93,3 +93,47 @@ Currently only `linode-standalone` is works, the rest are in development still.
 
 - Needs to be refactored to use project_environments.
 - Doesnt support postgres or supabase yet.
+
+## Adding a new postgres provider
+
+1. Create a new directory in `cloud-environments/postgres/new-provider` with the name of the provider.
+2. Update [inputs.tf](./inputs.tf) to add the new provider to the `project_database_type` variable so that it is validated correctly.
+3. Update [locals.tf](./locals.tf) to add the new provider to the `provider_supported_database_types` map.
+4. Update each cloud provider to support the new provider. See the implementation in [linode-standalone](../../cloud-environments/nuxt/linode-standalone/database.tf) for an example.
+5. Update the [README.md](./README.md) to add the new provider to the list of supported providers.
+
+## Adding a new cloud provider
+
+1. Create a new directory in `cloud-environments/new-provider` with the name of the provider.
+2. Update [inputs.tf](./inputs.tf) to add the new provider to the `project_cloud_provider` variable so that it is validated correctly.
+3. Update [locals.tf](./locals.tf) to add the new provider to the `provider_supported_database_types` map.
+4. Create a new `inputs.tf` file in the new provider directory with the same name as the provider.
+
+   ```terraform
+   variable "project_name" {
+     type        = string
+     description = "The name of the project to deploy."
+   }
+
+   # May not need this if the provider does not support multiple environments (see [linode's postgres](../../cloud-environments//postgres//linode/database.tf) and its usage in [linode-standalone](../../cloud-environments/nuxt/linode-standalone/database.tf) for an example).
+   
+   variable "project_environments" {
+     type        = list(string)
+     description = "The environments to deploy to."
+     default     = ["development"]
+
+     validation {
+       condition     = contains(["development", "staging", "production"], var.project_environment)
+       error_message = "Environment must be one of: development, staging, production."
+     }
+   }
+
+   variable "project_tags" {
+     type        = list(string)
+     description = "The tags to apply to the project."
+     default     = []
+   }
+   ```
+
+5. Add each database type to the new provider that you want to support. See the implementation in [linode-standalone](../../cloud-environments/nuxt/linode-standalone/database.tf) for an example.
+6. Update the [README.md](./README.md) to add the new provider to the list of supported providers.
