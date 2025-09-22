@@ -86,6 +86,7 @@ runs:
       with:
         name: ${{ inputs.upload-artifact-name }}
         path: ${{ inputs.build-output-directory }}
+        include-hidden-files: true # Workaround for .output directory not being included.
         overwrite: ${{ inputs.overwrite-build-artifacts }}
 
 
