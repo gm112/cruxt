@@ -22,6 +22,14 @@ inputs:
     required: false
     default: ${{ github.workflow }}-${{ github.sha }}
 
+outputs:
+  build-artifacts-path:
+    description: 'Path to the build artifacts'
+    value: ${{ steps.upload-build-artifacts.outputs.artifact-path }}
+  build-artifacts-name:
+    description: 'Name of the build artifacts'
+    value: ${{ steps.upload-build-artifacts.outputs.artifact-name }}
+
 runs:
   using: 'composite'
   steps:
@@ -83,10 +91,19 @@ runs:
     - name: Upload Build Artifacts
       if: inputs.upload-build-artifacts == 'true'
       uses: actions/upload-artifact@v4
+      id: upload-build-artifacts
       with:
         name: ${{ inputs.upload-artifact-name }}
         path: ${{ inputs.build-output-directory }}
         include-hidden-files: true # Workaround for .output directory not being included.
         overwrite: ${{ inputs.overwrite-build-artifacts }}
+
+    - name: Forward Build Artifacts to outputs
+      if: inputs.upload-build-artifacts == 'true'
+      shell: bash
+      run: |
+        echo "build-artifacts-path=${{ steps.upload-build-artifacts.outputs.artifact-path }}" >> $GITHUB_OUTPUT
+        echo "build-artifacts-name=${{ steps.upload-build-artifacts.outputs.artifact-name }}" >> $GITHUB_OUTPUT
+
 
 
