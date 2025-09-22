@@ -1,7 +1,7 @@
 {
   "name": "nuxt-v4-mobile-app-with-auth",
-  "type": "module",
   "private": true,
+  "type": "module",
   "config": {
     "environments": ["development"],
     "tags": ["internal"],

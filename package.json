@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  "private": true,
   "scripts": {
     "prepare": "pnpm workspace:setup:all",
     "playground": "pnpm run --filter=nuxt-v4-mobile-app-with-auth dev",
