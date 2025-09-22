@@ -34,7 +34,7 @@ jobs:
               with:
                   upload-build-artifacts: true
                   overwrite-build-artifacts: true
-                  build-output-directory: ./projects/nuxt-v4-mobile-app-with-auth/.output/
+                  build-output-directory: projects/nuxt-v4-mobile-app-with-auth/.output/
 
     dependabot-check:
         runs-on: ubuntu-latest
