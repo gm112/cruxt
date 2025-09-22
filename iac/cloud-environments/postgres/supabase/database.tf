@@ -5,8 +5,8 @@
 # }
 
 resource "supabase_project" "test" {
-  organization_id   = "continued-brown-smelt"
-  name              = "foo"
+  organization_id   = locals.supabase_organization_id
+  name              = var.project_name
   database_password = "bar"
   region            = "us-east-1"
   instance_size     = "micro"

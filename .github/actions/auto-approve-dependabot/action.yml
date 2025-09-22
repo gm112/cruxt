@@ -1,3 +1,4 @@
+# Documentation can be found at file://./README.md
 name: 'Auto approve dependabot PRs'
 description: 'Automatically approve dependabot PRs'
 runs:

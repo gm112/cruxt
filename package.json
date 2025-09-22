@@ -4,13 +4,14 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "prepare": "bash -c '[ ! -d ./layers/base/.nuxt ] && pnpm run --parallel dev:prepare || true' && bash -c '[ ! -f ./shared/localhost/localhost.pem ] && [ -z $DENO_DEPLOY ] && pnpm run workspace:generate-certs || true'",
+    "prepare": "bash -c '[ ! -d ./layers/base/.nuxt ] && pnpm workspace:generate-tsconfig-project-references && pnpm run --parallel dev:prepare || true' && bash -c '[ ! -f ./shared/localhost/localhost.pem ] && [ -z $DENO_DEPLOY ] && pnpm run workspace:generate-certs || true'",
     "playground": "pnpm run --filter=nuxt-v4-mobile-app-with-auth dev",
     "test:all": "pnpm run --parallel test",
     "format:all": "pnpm run --parallel format",
     "lint:all": "pnpm run --parallel lint",
     "deploy:deno:project": "NUXT_PUBLIC_I18N_BASE_URL=/ pnpm run --filter=$PROJECT_NAME build && pnpm run --filter=$PROJECT_NAME deploy:deno",
-    "workspace:generate-certs": "bash -c 'command -v mkcert && cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1' || true"
+    "workspace:generate-certs": "bash -c 'command -v mkcert && cd ./shared/localhost && mkcert -install && mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1' || true",
+    "workspace:generate-tsconfig-project-references": "bash ./scripts/update-tsconfig.sh"
   },
   "keywords": [],
   "author": "gm112",

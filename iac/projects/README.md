@@ -85,6 +85,10 @@ The Linode API token.
 
 The Cloudflare API token.
 
+## [apps.tf](./apps.tf) - Terraform Entrypoint
+
+This file is the entrypoint for the terraform workspace, it reads the `projects` variable and creates a module for each project.
+
 ## Developemnt Notes/Ideas/TODO
 
 - [ ] Add a script that can scan the .tfvars and the `git_repository_url` and automatically generate the `projects` variable.

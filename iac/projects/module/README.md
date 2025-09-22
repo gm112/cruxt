@@ -1,6 +1,6 @@
 # terraform-project-module
 
-This module deploys a project to a cloud provider. Given a github repository url and branch, it will deploy the project to the cloud provider. It will also create a database if the database type is specified, currently only PostgreSQL is supported.
+This module deploys a project to a cloud provider. Given a github repository url and branch, it will deploy the project to the cloud provider. It will also create a database if the database type is specified, currently only PostgreSQL is supported. This module is used by the [Projects Workspace](../README.md) to abstract the deployment of projects.
 
 ## Inputs
 
