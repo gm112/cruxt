@@ -5,7 +5,8 @@
   "type": "module",
   "main": "./nuxt.config.ts",
   "scripts": {
-    "prepare": "nuxt prepare && nuxt prepare .playground",
+    "prepare": "nuxt prepare",
+    "postinstall": "nuxt prepare .playground",
     "dev": "nuxt dev .playground",
     "lint": "eslint .",
     "format": "eslint . --fix"
@@ -23,6 +24,7 @@
     "tailwindcss": "catalog:",
     "@nuxt/eslint": "catalog:",
     "eslint": "catalog:",
+    "nuxt": "catalog:",
     "@cruxt/base": "workspace:*"
   }
 }

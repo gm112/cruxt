@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "catalog:",
-    "eslint": "catalog:"
+    "eslint": "catalog:",
+    "nuxt": "catalog:"
   }
 }
