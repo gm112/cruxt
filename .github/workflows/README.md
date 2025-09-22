@@ -40,3 +40,8 @@ jobs:
   build:
     uses: cruxt/cruxt/.github/workflows/ci.yml@main
 ```
+
+## Actions
+
+- [action-build-pnpm-workspace](../actions/build-pnpm-workspace/README.md)
+- [action-auto-approve-dependabot](../actions/auto-approve-dependabot/README.md)

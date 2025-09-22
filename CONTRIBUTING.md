@@ -8,6 +8,7 @@
     - [Run the playground](#run-the-playground)
     - [Run the tests](#run-the-tests)
     - [Format/lint the code before committing](#formatlint-the-code-before-committing)
+  - [See also](#see-also)
 
 ## Development Guide
 
@@ -74,3 +75,9 @@ If all is well, you can commit your changes.
 git add .
 git commit -m "fix: fixing something"
 ```
+
+## See also
+
+- [Scripts Documentation](./scripts/README.md)
+- [Terraform Workspace Documentation](./iac/projects/README.md)
+- [GitHub Actions Documentation](./.github/workflows/README.md)
