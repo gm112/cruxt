@@ -20,7 +20,7 @@ inputs:
   upload-artifact-name:
     description: 'Name of the artifact to upload'
     required: false
-    default: 'build-artifacts'
+    default: ${{ github.workflow }}-${{ github.ref }}
 
 runs:
   using: 'composite'
