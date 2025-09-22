@@ -5,12 +5,11 @@ runs:
   steps:
     - name: Check if run is triggered by dependabot
       run: |
-        # Check if the event is from a pull_request event.
-        # If it is, then set an output named 'is_dependabot_pr' to true.
         if [[ "${{github.event_name}}" == "pull_request" ]]; then
           echo "is_dependabot_pr=true" >> $GITHUB_OUTPUT
         else
           echo "is_dependabot_pr=false" >> $GITHUB_OUTPUT
+          echo "Workflow is not triggered by dependabot PR, skipping"
         fi
       id: is-dependabot-pr
       shell: bash
