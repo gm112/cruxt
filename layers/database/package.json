@@ -19,12 +19,12 @@
     "@cruxt/ui": "workspace:*",
     "drizzle-orm": "catalog:",
     "drizzle-valibot": "catalog:",
-    "nuxt": "catalog:",
     "pg": "catalog:",
     "valibot": "catalog:"
   },
   "devDependencies": {
     "@types/pg": "catalog:",
+    "nuxt": "catalog:",
     "drizzle-kit": "catalog:"
   }
 }

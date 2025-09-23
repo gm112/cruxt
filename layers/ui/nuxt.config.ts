@@ -13,6 +13,13 @@ export default defineNuxtConfig({
     name: '@cruxt/ui',
   },
   css: [join(current_dir, './app/assets/css/main.css')],
+  runtimeConfig: {
+    public: {
+      i18n: {
+        baseUrl: process.env.NUXT_PUBLIC_I18N_BASE_URL ?? '/',
+      },
+    },
+  },
   i18n: {
     defaultLocale: 'en',
     locales: [

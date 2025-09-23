@@ -19,10 +19,10 @@
     "deploy:deno": "mv .output ../../"
   },
   "dependencies": {
-    "nuxt": "catalog:"
+    "@cruxt/auth": "workspace:*"
   },
   "devDependencies": {
-    "@cruxt/auth": "workspace:*",
+    "nuxt": "catalog:",
     "@cruxt/nuxt-module-capacitor": "workspace:*",
     "@capacitor/android": "catalog:",
     "@capacitor/assets": "catalog:",

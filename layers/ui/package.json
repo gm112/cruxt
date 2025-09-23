@@ -15,14 +15,14 @@
   "author": "gm112",
   "license": "MPL-2.0",
   "dependencies": {
+    "@cruxt/base": "workspace:*"
+  },
+  "devDependencies": {
     "nuxt": "catalog:",
-    "@cruxt/base": "workspace:*",
     "@nuxt/fonts": "catalog:",
     "@nuxt/icon": "catalog:",
     "@nuxt/ui": "catalog:",
-    "@nuxtjs/i18n": "catalog:"
-  },
-  "devDependencies": {
+    "@nuxtjs/i18n": "catalog:",
     "tailwindcss": "catalog:"
   }
 }

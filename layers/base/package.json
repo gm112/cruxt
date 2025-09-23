@@ -14,23 +14,23 @@
   "author": "gm112",
   "license": "MPL-2.0",
   "dependencies": {
+    "@nuxt/kit": "catalog:"
+  },
+  "devDependencies": {
+    "nuxt": "catalog:",
     "@nuxt/fonts": "catalog:",
     "@nuxt/icon": "catalog:",
-    "@nuxt/kit": "catalog:",
     "@nuxt/scripts": "catalog:",
     "@nuxt/test-utils": "catalog:",
     "@nuxt/ui": "catalog:",
     "@nuxtjs/i18n": "catalog:",
-    "@unhead/vue": "catalog:",
-    "nuxt": "catalog:",
-    "vue": "catalog:"
-  },
-  "devDependencies": {
     "@nuxt/eslint": "catalog:",
     "eslint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite-plugin-eslint2": "catalog:",
-    "vue-tsc": "catalog:"
+    "@unhead/vue": "catalog:",
+    "vue-tsc": "catalog:",
+    "vue": "catalog:"
   }
 }
