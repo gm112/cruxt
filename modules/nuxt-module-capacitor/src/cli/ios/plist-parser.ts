@@ -1,3 +1,12 @@
+/**
+ * plist_parser
+ * A parser for serializing and deserializing Apple Info.plist files.
+ * @license MPL-2.0
+ * @author Jonathan Basniak
+ * @see {serialize_json_to_plist}
+ * @see {deserialize_json_to_plist}
+ */
+
 export type plist_parser_error_types = 'unsupported_value_type' | 'unsupported_tag' | 'invalid_xml' | 'info_plist_not_found' | 'infinite_loop'
 export type plist_value = string | boolean | plist_value[] | { [key: string]: plist_value }
 
@@ -16,43 +25,56 @@ export function serialize_json_to_plist(json: plist_value) {
   ].join('\n')
 }
 
+const plist_parser_xml_regex = /<plist[^>]*>([\s\S]*?)<\/plist>/
 /**
  * Deserialize plist XML to JS object
  * @param xml - plist XML string
  * @returns JS object representation of plist XML
  */
 export function deserialize_json_to_plist(xml: string): plist_value {
-  const [_, match] = xml.match(/<plist[^>]*>([\s\S]*?)<\/plist>/) ?? []
-  if (!match) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml, match } })
+  const [,match] = xml.match(plist_parser_xml_regex) ?? []
+  if (!match) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml } })
   return deserialize_xml_part_to_key_value(match.trim()) satisfies plist_value
 }
 
+/* Serialization */
+
 function serialize_plist(value: plist_value, depth = 0): string {
   const indent = '\t'.repeat(depth)
-  if (typeof value === 'string')
-    return `${indent}<string>${escape_xml(value)}</string>`
-  else if (typeof value === 'boolean')
-    return `${indent}${value ? '<true/>' : '<false/>'}`
-
-  if (Array.isArray(value)) {
-    if (value.length === 0) return `${indent}<array/>`
-    return `${indent}<array>\n${
-      value.map((plist_item_value) => {
-        if (plist_item_value === undefined || plist_item_value === null)
-          throw new Error('unsupported_value_type' as plist_parser_error_types, {
-            cause: { value: plist_item_value, reason: 'undefined or null in array' },
-          })
-
-        return serialize_plist(plist_item_value, depth + 1)
-      }).join('\n')
-    }\n${indent}</array>`
-  }
-
-  if (typeof value !== 'object' || value === null || value === undefined)
+  if (typeof value === 'string') return serialize_string(value, indent)
+  else if (typeof value === 'boolean') return serialize_boolean(value, indent)
+  else if (Array.isArray(value)) return serialize_array(value, indent, depth)
+  else if (typeof value !== 'object' || value === null || value === undefined)
     throw new Error('unsupported_value_type' as plist_parser_error_types, {
       cause: { value, depth, type: typeof value },
     })
 
+  return serialize_object(value as Record<string, plist_value>, indent, depth)
+}
+
+function serialize_string(value: string, indent: string) {
+  return `${indent}<string>${escape_xml(value)}</string>`
+}
+
+function serialize_boolean(value: boolean, indent: string) {
+  return `${indent}${value ? '<true/>' : '<false/>'}`
+}
+
+function serialize_array(value: plist_value[], indent: string, depth: number) {
+  if (value.length === 0) return `${indent}<array/>`
+  return `${indent}<array>\n${
+    value.map((plist_item_value) => {
+      if (plist_item_value === undefined || plist_item_value === null)
+        throw new Error('unsupported_value_type' as plist_parser_error_types, {
+          cause: { value: plist_item_value, reason: 'undefined or null in array' },
+        })
+
+      return serialize_plist(plist_item_value, depth + 1)
+    }).join('\n')
+  }\n${indent}</array>`
+}
+
+function serialize_object(value: Record<string, plist_value>, indent: string, depth: number) {
   const keys = Object.keys(value)
   if (keys.length === 0) return `${indent}<dict/>`
 
@@ -70,6 +92,8 @@ function serialize_plist(value: plist_value, depth = 0): string {
       .join('\n')
   }\n${indent}</dict>`
 }
+
+/* Deserialization */
 
 const plist_parser_regex = /<(dict|array|string)>([\s\S]*?)<\/\1>/
 function deserialize_xml_part_to_key_value(xml_string: string): plist_value {
@@ -116,7 +140,7 @@ function parse_plist_array(xml: string) {
   let remaining = xml.trim()
   while (remaining) {
     const xml_part_length = remaining.length
-    const self_closing_match = remaining.match(plist_parser_array_self_closing_tag_regex)
+    const self_closing_match = plist_parser_array_self_closing_tag_regex.test(remaining) ? remaining.match(plist_parser_array_self_closing_tag_regex) : undefined
     if (self_closing_match && self_closing_match.length >= 2) {
       const tag = self_closing_match[1]
       if (tag === 'array') result.push([])
@@ -126,11 +150,12 @@ function parse_plist_array(xml: string) {
       continue
     }
 
-    const element_match = remaining.match(plist_parser_array_item_regex) // arrays only support strings, dicts, and arrays.
-    if (!element_match) throw new Error('unsupported_tag' as plist_parser_error_types, { cause: { xml, remaining } })
+    if (!plist_parser_array_item_regex.test(remaining))
+      throw new Error('unsupported_tag' as plist_parser_error_types, { cause: { xml, remaining } })
 
-    result.push(deserialize_xml_part_to_key_value(element_match[0]))
-    remaining = remaining.slice(element_match[0].length).trim()
+    const [item] = remaining.match(plist_parser_array_item_regex)! // arrays only support strings, dicts, and arrays.
+    result.push(deserialize_xml_part_to_key_value(item))
+    remaining = remaining.slice(item.length).trim()
     // sanity check: ensure we made progress
     if (remaining.length === xml_part_length)
       throw new Error('infinite_loop' as plist_parser_error_types, { cause: { remaining_length: remaining.length, xml_length: xml_part_length, remaining, xml } })
@@ -139,16 +164,22 @@ function parse_plist_array(xml: string) {
   return result
 }
 
+/* Utilities */
+
 const plist_parser_escape_xml_regex = /[&<>"']/g
 const escape_xml_lookup = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&apos;' } as Record<string, string>
 function escape_xml(raw_string: string) {
-  return raw_string.replaceAll(plist_parser_escape_xml_regex, character => (escape_xml_lookup[character]!))
+  return plist_parser_escape_xml_regex.test(raw_string)
+    ? raw_string.replaceAll(plist_parser_escape_xml_regex, character => (escape_xml_lookup[character]!))
+    : raw_string
 }
 
 const plist_parser_unescape_xml_regex = /&(amp|lt|gt|quot|apos);/g
 const unescape_xml_lookup = { amp: '&', lt: '<', gt: '>', quot: '"', apos: '\'' } as Record<string, string>
 function unescape_xml(xml_string: string) {
-  return xml_string.replaceAll(plist_parser_unescape_xml_regex, (_, entity: string) =>
-    (unescape_xml_lookup[entity]!),
-  )
+  return plist_parser_unescape_xml_regex.test(xml_string)
+    ? xml_string.replaceAll(plist_parser_unescape_xml_regex, (_, entity: string) =>
+        (unescape_xml_lookup[entity]!),
+      )
+    : xml_string
 }
