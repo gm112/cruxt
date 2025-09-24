@@ -4,12 +4,39 @@ Get your module up and running quickly.
 Find and replace all on all files (CMD+SHIFT+F):
 - Name: @cruxt/nuxt-module-template-project
 - Package name: @cruxt/nuxt-module-template-project
-- Description: Configures and installs capacitor within a nuxt project.
+- Description: Description of the module goes here.
+- Repository slug: @cruxt/module-repo
+- Repository URL: https://github.com/your-org/@cruxt/module-repo
 Use this simple bash one liner to update the name and description:
 
 ```bash
-find . -type f -name "*.md" -exec sed -i '' -e "s/@cruxt\/nuxt-module-template-project/@your-org\/@cruxt\/nuxt-module-template-project/g" {} +
-find . -type f -name "*.md" -exec sed -i '' -e "s/Configures and installs capacitor within a nuxt project./Configures and installs capacitor within a nuxt project./g" {} +
+bash -c '
+if [ -n "$(git status --porcelain)" ]; then
+  echo "Warning: Git repo is not clean. Replacements skipped."
+  exit 0
+fi
+read -p "New project name: " N
+read -p "New package name: " P
+read -p "New description: " D
+read -p "New config key: " C
+read -p "New repo slug: " S
+read -p "New repo URL: " U
+EN=$(printf "%s" "$N" | sed "s/[&/\]/\\&/g")
+EP=$(printf "%s" "$P" | sed "s/[&/\]/\\&/g")
+ED=$(printf "%s" "$D" | sed "s/[&/\]/\\&/g")
+EC=$(printf "%s" "$C" | sed "s/[&/\]/\\&/g")
+ES=$(printf "%s" "$S" | sed "s/[&/\]/\\&/g")
+EU=$(printf "%s" "$U" | sed "s/[&/\]/\\&/g")
+find . -type f ! -path "*/node_modules/*" ! -path "*/.git/*" -exec sh -c '\''for f; do file "$f" | grep -q text && sed -i \
+  -e "s|@cruxt/nuxt-module-template-project|$0|g" \
+  -e "s|@cruxt/nuxt-module-template-project|$1|g" \
+  -e "s|cruxt_nuxt_module_template_project|$2|g" \
+  -e "s|@cruxt/module-repo|$3|g" \
+  -e "s|https://github.com/your-org/@cruxt/module-repo|$4|g" \
+  -e "s|Description of the module goes here.|$5|g" "$f"; done'\'' sh "$EN" "$EP" "$EC" "$ES" "$EU" "$ED"
+echo "Replacement complete!"
+'
+
 ```
 -->
 
@@ -20,10 +47,10 @@ find . -type f -name "*.md" -exec sed -i '' -e "s/Configures and installs capaci
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
-Configures and installs capacitor within a nuxt project.
+Description of the module goes here.
 
 - [✨ &nbsp;Release Notes](/CHANGELOG.md)
-<!-- - [🏀 Online playground](https://stackblitz.com/github/your-org/@cruxt/nuxt-module-template-project?file=playground%2Fapp.vue) -->
+<!-- - [🏀 Online playground](https://stackblitz.com/github/@cruxt/module-repo?file=playground%2Fapp.vue) -->
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
 ## Features

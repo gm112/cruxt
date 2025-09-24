@@ -17,7 +17,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 Configures and installs capacitor within a nuxt project. for doing amazing things.
 
 - [✨ &nbsp;Release Notes](/CHANGELOG.md)
-<!-- - [🏀 Online playground](https://stackblitz.com/github/your-org/@cruxt/nuxt-module-capacitor?file=playground%2Fapp.vue) -->
+<!-- - [🏀 Online playground](https://stackblitz.com/github/@cruxt/nuxt-module-capacitor?file=playground%2Fapp.vue) -->
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
 ## Features
