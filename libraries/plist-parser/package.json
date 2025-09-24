@@ -7,6 +7,8 @@
   "license": "MPL-2.0",
   "type": "module",
   "scripts": {
+    "lint": "eslint .",
+    "format": "eslint . --fix",
     "test": "vitest run",
     "bench": "vitest bench"
   },
