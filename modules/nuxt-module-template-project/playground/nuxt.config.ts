@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
   modules: ['../src/module'],
   devtools: { enabled: true },
-  myModule: {},
+  cruxt_nuxt_module_capacitor: {},
 })

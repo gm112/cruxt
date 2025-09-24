@@ -1,10 +1,11 @@
 {
-  "name": "@cruxt/nuxt-module-capacitor",
+  "name": "@cruxt/nuxt-module-template-project",
   "version": "1.0.0",
-  "description": "Configures and installs capacitor within a nuxt project.",
-  "repository": "your-org/@cruxt/nuxt-module-capacitor",
+  "description": "Description of the module goes here.",
+  "repository": "@cruxt/module-repo",
   "license": "MPL-2.0",
   "type": "module",
+  "private": true,
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
@@ -38,6 +39,7 @@
     "@nuxt/kit": "catalog:"
   },
   "devDependencies": {
+    "@cruxt/base": "workspace:*",
     "@nuxt/devtools": "catalog:",
     "@nuxt/eslint-config": "catalog:",
     "@nuxt/module-builder": "catalog:",

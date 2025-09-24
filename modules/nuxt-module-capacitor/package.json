@@ -2,7 +2,7 @@
   "name": "@cruxt/nuxt-module-capacitor",
   "version": "1.0.0",
   "description": "Configures and installs capacitor within a nuxt project.",
-  "repository": "your-org/@cruxt/nuxt-module-capacitor",
+  "repository": "@gm112/cruxt",
   "license": "MPL-2.0",
   "type": "module",
   "exports": {

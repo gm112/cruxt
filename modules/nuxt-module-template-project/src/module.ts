@@ -5,8 +5,8 @@ export type ModuleOptions = Record<string, string>
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: '@cruxt/nuxt-module-capacitor',
-    configKey: 'cruxt_nuxt_module_capacitor',
+    name: '@cruxt/nuxt-module-template-project',
+    configKey: 'cruxt_nuxt_module_template_project', // TODO: Change this to your module name
   },
   // Default configuration options of the Nuxt module
   defaults: {},

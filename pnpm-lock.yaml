@@ -316,6 +316,9 @@ importers:
         specifier: 'catalog:'
         version: 4.1.2(magicast@0.3.5)
     devDependencies:
+      '@cruxt/base':
+        specifier: workspace:*
+        version: link:../../layers/base
       '@nuxt/devtools':
         specifier: 'catalog:'
         version: 2.6.5(vite@7.1.7(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.9.2))
@@ -400,7 +403,7 @@ importers:
         version: 7.0.2(@capacitor/core@7.4.3)
       '@cruxt/nuxt-module-capacitor':
         specifier: workspace:*
-        version: link:../../modules/nuxt-module-template-project
+        version: link:../../modules/nuxt-module-capacitor
       '@transistorsoft/capacitor-background-fetch':
         specifier: 'catalog:'
         version: 7.1.0(@capacitor/core@7.4.3)

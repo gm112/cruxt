@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@cruxt/nuxt-module-capacitor-playground",
+  "name": "@cruxt/nuxt-module-template-project-playground",
   "type": "module",
   "scripts": {
     "dev": "nuxi dev",
@@ -8,6 +8,6 @@
     "generate": "nuxi generate"
   },
   "dependencies": {
-    "nuxt": "^4.1.2"
+    "nuxt": "catalog:"
   }
 }
