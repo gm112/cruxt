@@ -38,6 +38,8 @@
     "@nuxt/kit": "catalog:"
   },
   "devDependencies": {
+    "@capacitor/cli": "catalog:",
+    "@capacitor/core": "catalog:",
     "@nuxt/devtools": "catalog:",
     "@nuxt/eslint-config": "catalog:",
     "@nuxt/module-builder": "catalog:",

@@ -23,6 +23,7 @@
     "@nuxt/icon": "catalog:",
     "@nuxt/ui": "catalog:",
     "@nuxtjs/i18n": "catalog:",
+    "eslint": "catalog:",
     "tailwindcss": "catalog:"
   }
 }
