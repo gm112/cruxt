@@ -14,10 +14,10 @@ if [ -z "$PACKAGE_NAME" ]; then
   exit 1
 fi
 
-echo "🚀 Generating new module: $PACKAGE_NAME"
+echo "Generating new module: $PACKAGE_NAME"
 
 if [ ! -d "modules" ]; then
-  echo "🚨 No modules directory found. Please run this script from the root of the project."
+  echo "No modules directory found. Please run this script from the root of the project."
   exit 1
 fi
 
@@ -46,4 +46,4 @@ replace_in_files "@cruxt/module-repo" "$REPOSITORY_SLUG"
 replace_in_files "https://stackblitz.com/github/@cruxt/module-repo?file=playground%2Fapp.vue" "$STACKBLITZ_URL"
 replace_in_files "https://example.com" "$DOCUMENTATION_URL"
 
-echo "🎉 Done! You can now run 'pnpm run dev' to start developing your module."
+echo "Done! You can now run 'pnpm run dev' to start developing your module."
