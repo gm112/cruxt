@@ -1,7 +1,7 @@
 {
   "name": "@cruxt/database",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
   "type": "module",
   "main": "./nuxt.config.ts",
