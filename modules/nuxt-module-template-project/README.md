@@ -11,31 +11,46 @@ Use this simple bash one liner to update the name and description:
 
 ```bash
 bash -c '
+# Check if Git repo is clean
 if [ -n "$(git status --porcelain)" ]; then
   echo "Warning: Git repo is not clean. Replacements skipped."
   exit 0
 fi
-read -p "New project name: " N
-read -p "New package name: " P
-read -p "New description: " D
-read -p "New config key: " C
-read -p "New repo slug: " S
-read -p "New repo URL: " U
-EN=$(printf "%s" "$N" | sed "s/[&/\]/\\&/g")
-EP=$(printf "%s" "$P" | sed "s/[&/\]/\\&/g")
-ED=$(printf "%s" "$D" | sed "s/[&/\]/\\&/g")
-EC=$(printf "%s" "$C" | sed "s/[&/\]/\\&/g")
-ES=$(printf "%s" "$S" | sed "s/[&/\]/\\&/g")
-EU=$(printf "%s" "$U" | sed "s/[&/\]/\\&/g")
-find . -type f ! -path "*/node_modules/*" ! -path "*/.git/*" -exec sh -c '\''for f; do file "$f" | grep -q text && sed -i \
-  -e "s|@cruxt/nuxt-module-template-project|$0|g" \
-  -e "s|@cruxt/nuxt-module-template-project|$1|g" \
-  -e "s|cruxt_nuxt_module_template_project|$2|g" \
-  -e "s|@cruxt/module-repo|$3|g" \
-  -e "s|https://github.com/your-org/@cruxt/module-repo|$4|g" \
-  -e "s|Description of the module goes here.|$5|g" "$f"; done'\'' sh "$EN" "$EP" "$EC" "$ES" "$EU" "$ED"
+
+# Prompt for replacement values
+read -p "Enter new project display name: " NEW_PROJECT_NAME
+read -p "Enter new package name: " NEW_PACKAGE_NAME
+read -p "Enter new module description: " NEW_MODULE_DESCRIPTION
+read -p "Enter new config key: " NEW_CONFIG_KEY
+read -p "Enter new repository slug: " NEW_REPO_SLUG
+read -p "Enter new repository URL: " NEW_REPO_URL
+
+# Escape special characters for safe sed replacement
+ESCAPED_PROJECT_NAME=$(printf "%s" "$NEW_PROJECT_NAME" | sed "s/[&/\]/\\&/g")
+ESCAPED_PACKAGE_NAME=$(printf "%s" "$NEW_PACKAGE_NAME" | sed "s/[&/\]/\\&/g")
+ESCAPED_MODULE_DESCRIPTION=$(printf "%s" "$NEW_MODULE_DESCRIPTION" | sed "s/[&/\]/\\&/g")
+ESCAPED_CONFIG_KEY=$(printf "%s" "$NEW_CONFIG_KEY" | sed "s/[&/\]/\\&/g")
+ESCAPED_REPO_SLUG=$(printf "%s" "$NEW_REPO_SLUG" | sed "s/[&/\]/\\&/g")
+ESCAPED_REPO_URL=$(printf "%s" "$NEW_REPO_URL" | sed "s/[&/\]/\\&/g")
+
+# Find all text files and perform replacements
+find . -type f ! -path "*/node_modules/*" ! -path "*/.git/*" -exec sh -c '
+for file_path; do
+  if file "$file_path" | grep -q text; then
+    sed -i \
+      -e "s|@cruxt/nuxt-module-template-project|$0|g" \
+      -e "s|@cruxt/nuxt-module-template-project|$1|g" \
+      -e "s|cruxt_nuxt_module_template_project|$2|g" \
+      -e "s|@cruxt/module-repo|$3|g" \
+      -e "s|https://github.com/your-org/@cruxt/module-repo|$4|g" \
+      -e "s|Description of the module goes here.|$5|g" "$file_path"
+  fi
+done
+' sh "$ESCAPED_PROJECT_NAME" "$ESCAPED_PACKAGE_NAME" "$ESCAPED_CONFIG_KEY" "$ESCAPED_REPO_SLUG" "$ESCAPED_REPO_URL" "$ESCAPED_MODULE_DESCRIPTION"
+
 echo "Replacement complete!"
 '
+
 
 ```
 -->
