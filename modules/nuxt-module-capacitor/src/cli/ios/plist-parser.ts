@@ -36,15 +36,16 @@ function serialize_plist(value: plist_value, depth = 0): string {
 
   if (Array.isArray(value)) {
     if (value.length === 0) return `${indent}<array/>`
-    const items = value.map((plist_item_value) => {
-      if (plist_item_value === undefined || plist_item_value === null)
-        throw new Error('unsupported_value_type' as plist_parser_error_types, {
-          cause: { value: plist_item_value, reason: 'undefined or null in array' },
-        })
+    return `${indent}<array>\n${
+      value.map((plist_item_value) => {
+        if (plist_item_value === undefined || plist_item_value === null)
+          throw new Error('unsupported_value_type' as plist_parser_error_types, {
+            cause: { value: plist_item_value, reason: 'undefined or null in array' },
+          })
 
-      return serialize_plist(plist_item_value, depth + 1)
-    }).join('\n')
-    return `${indent}<array>\n${items}\n${indent}</array>`
+        return serialize_plist(plist_item_value, depth + 1)
+      }).join('\n')
+    }\n${indent}</array>`
   }
 
   if (typeof value !== 'object' || value === null || value === undefined)

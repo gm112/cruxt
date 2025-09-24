@@ -56,6 +56,45 @@ describe('plist_parser', () => {
   </array>
 </plist>
 `.trim(),
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <array>
+      <string>ok</string>
+      <true/>
+      <123></123>
+      <test></test>
+      <barf/>
+      ssss
+  </array>
+</plist>
+`.trim(),
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <array>
+      <string>ok</string>
+      <array/>
+      <dict/>
+      <array>
+      </array>
+      <dict></dict>
+      <true/>
+      ssss
+  </array>
+</plist>
+`.trim(),
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <array>
+      <></>
+  </array>
+</plist>
+`.trim(),
     ].map((xml, index) => it(`throws_on_malformed_array_content_${index + 1}`, () =>
       expect(() => deserialize_json_to_plist(xml)).toThrowError(/unsupported_tag/),
     ))
@@ -80,6 +119,15 @@ describe('plist_parser', () => {
     ???
   </dict>
 </plist>
+`.trim(),
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>
+    12345
+  </dict>
 `.trim(),
     ].map((xml, index) => it(`throws_on_malformed_dict_content_${index + 1}_2`, () =>
       expect(() => deserialize_json_to_plist(xml)).toThrowError(/invalid_xml/),
