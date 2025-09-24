@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  extends: ['@cruxt/ui'],
+  extends: ['@cruxt/base'],
   $meta: {
     name: '@cruxt/database',
   },

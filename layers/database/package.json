@@ -16,6 +16,7 @@
   "author": "gm112",
   "license": "MPL-2.0",
   "dependencies": {
+    "@cruxt/base": "workspace:*",
     "@cruxt/ui": "workspace:*",
     "drizzle-orm": "catalog:",
     "drizzle-valibot": "catalog:",
