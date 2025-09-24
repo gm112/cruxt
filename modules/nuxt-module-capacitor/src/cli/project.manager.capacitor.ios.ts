@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { deserialize_json_to_plist, serialize_json_to_plist, type plist_value } from './ios/plist-parser.js'
+import { deserialize_json_to_plist, serialize_json_to_plist, type plist_value } from '@cruxt/plist-parser'
 import { join, resolve } from 'node:path'
 import type { CapacitorModuleOptions } from '../module.js'
 

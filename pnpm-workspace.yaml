@@ -2,6 +2,7 @@ packages:
   - layers/*
   - modules/*
   - projects/*
+  - libraries/*
 
 catalog:
   '@capacitor/android': ^7.4.3

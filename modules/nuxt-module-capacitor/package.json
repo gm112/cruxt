@@ -35,7 +35,8 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
-    "@nuxt/kit": "catalog:"
+    "@nuxt/kit": "catalog:",
+    "@cruxt/plist-parser": "workspace:*"
   },
   "devDependencies": {
     "@capacitor/cli": "catalog:",
