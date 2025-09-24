@@ -110,6 +110,7 @@ function deserialize_xml_part_to_key_value(xml_string: string): plist_value {
 
   const [, tag, content] = match
   if (!xml_string.endsWith(`</${tag}>`)) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml_string } })
+
   if (tag === 'string') return unescape_xml(content!)
   else if (tag === 'dict') return parse_plist_dict(content!)
   else if (tag === 'array') return parse_plist_array(content!)
@@ -138,6 +139,7 @@ const plist_parser_array_item_regex = /^<(dict|array|string)>([\s\S]*?)<\/\1>/
 function parse_plist_array(xml: string) {
   const result: plist_value[] = []
   let remaining = xml.trim()
+
   while (remaining) {
     const xml_part_length = remaining.length
     const self_closing_match = plist_parser_array_self_closing_tag_regex.test(remaining) ? remaining.match(plist_parser_array_self_closing_tag_regex) : undefined
