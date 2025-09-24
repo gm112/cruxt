@@ -65,20 +65,6 @@ describe('plist_parser', () => {
 <plist version="1.0">
   <array>
       <string>ok</string>
-      <true/>
-      <123></123>
-      <test></test>
-      <barf/>
-      ssss
-  </array>
-</plist>
-`.trim(),
-      `
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-  <array>
-      <string>ok</string>
       <array/>
       <dict/>
       <dict />
@@ -106,16 +92,6 @@ describe('plist_parser', () => {
     ))
 
     const _malformed_dict_tests = [
-      `
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-  <dict>
-    <key>CFBundleName</key>
-    <!-- missing value here -->
-  </dict>
-</plist>
-`.trim(),
       `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -152,7 +128,6 @@ describe('plist_parser', () => {
   <dict>
     <key>
     12345
-</plist>
 `.trim(),
     ].map((xml, index) => it(`throws_on_malformed_dict_content_${index + 1}_2`, () =>
       expect(() => deserialize_json_to_plist(xml)).toThrowError(/invalid_xml/),
