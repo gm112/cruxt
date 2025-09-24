@@ -1,4 +1,4 @@
-export type plist_parser_error_types = 'unsupported_value_type' | 'unsupported_tag' | 'invalid_xml' | 'info_plist_not_found'
+export type plist_parser_error_types = 'unsupported_value_type' | 'unsupported_tag' | 'invalid_xml' | 'info_plist_not_found' | 'infinite_loop'
 export type plist_value = string | boolean | plist_value[] | { [key: string]: plist_value }
 
 /**
@@ -24,7 +24,7 @@ export function serialize_json_to_plist(json: plist_value) {
 export function deserialize_json_to_plist(xml: string): plist_value {
   const [_, match] = xml.match(/<plist[^>]*>([\s\S]*?)<\/plist>/) ?? []
   if (!match) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml, match } })
-  return parse_xml_part(match.trim()) satisfies plist_value
+  return deserialize_xml_part_to_key_value(match.trim()) satisfies plist_value
 }
 
 function serialize_plist(value: plist_value, depth = 0): string {
@@ -71,77 +71,84 @@ function serialize_plist(value: plist_value, depth = 0): string {
   }\n${indent}</dict>`
 }
 
-function parse_xml_part(xml_string: string): plist_value {
+const plist_parser_regex = /<(dict|array|string)>([\s\S]*?)<\/\1>/
+function deserialize_xml_part_to_key_value(xml_string: string): plist_value {
   const xml = xml_string.trim()
-
   if (xml === '<true/>' || xml === '<false/>') return xml === '<true/>'
-  if (xml === '<array/>') return []
-  if (xml === '<dict/>') return {}
+  else if (xml === '<array/>') return []
+  else if (xml === '<dict/>') return {}
 
-  const match = xml.match(/^<(dict|array|string)>([\s\S]*?)<\/\1>$/)
+  const match = xml.match(plist_parser_regex)
   if (!match)
     throw new Error('invalid_xml' as plist_parser_error_types, {
       cause: { xml_string },
     })
 
-  const [, tag, value_content] = match
-  const content = value_content ?? ''
-
-  if (tag === 'string') return unescape_xml(content)
-  else if (tag === 'dict') return parse_plist_dict(content)
-  return parse_plist_array(content)
+  const [, tag, content] = match
+  if (!xml_string.endsWith(`</${tag}>`)) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml_string } })
+  if (tag === 'string') return unescape_xml(content!)
+  else if (tag === 'dict') return parse_plist_dict(content!)
+  else if (tag === 'array') return parse_plist_array(content!)
+  throw new Error('invalid_xml' as plist_parser_error_types, {
+    cause: { xml_string },
+  })
 }
 
+const plist_parser_dict_regex = /<key>([\s\S]*?)<\/key>/
 function parse_plist_dict(xml: string) {
   const result: Record<string, plist_value> = {}
-  const parts: string[] = xml.split(/<key>([\s\S]*?)<\/key>/)?.slice(1) ?? []
+  const parts = xml.split(plist_parser_dict_regex)?.slice(1)
 
   for (let index = 0; index + 1 < parts.length; index += 2) {
     const [key_part, value_part] = parts.slice(index, index + 2)
     const value_xml = value_part?.trim()
-    if (typeof key_part !== 'string' || !value_xml) continue
-    result[unescape_xml(key_part)] = parse_xml_part(value_xml)
+    if (typeof key_part !== 'string' || !value_xml) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml, key_part, value_part } })
+    result[unescape_xml(key_part)] = deserialize_xml_part_to_key_value(value_xml)
   }
 
   return result
 }
 
+const plist_parser_array_self_closing_tag_regex = /<(dict|array|string|true|false)\/>/
+const plist_parser_array_item_regex = /^<(dict|array|string)>([\s\S]*?)<\/\1>/
 function parse_plist_array(xml: string) {
   const result: plist_value[] = []
   let remaining = xml.trim()
   while (remaining) {
     const xml_part_length = remaining.length
-    const self_closing_match = remaining.match(/^<(true|false|array|dict)\/>/)
-    if (self_closing_match) {
+    const self_closing_match = remaining.match(plist_parser_array_self_closing_tag_regex)
+    if (self_closing_match && self_closing_match.length >= 2) {
       const tag = self_closing_match[1]
-      if (tag === 'true' || tag === 'false') result.push(tag === 'true')
-      else if (tag === 'array') result.push([])
+      if (tag === 'array') result.push([])
       else if (tag === 'dict') result.push({})
-      else throw new Error('unsupported_tag', { cause: { tag, xml, self_closing_match } })
 
       remaining = remaining.slice(self_closing_match[0].length).trim()
       continue
     }
 
-    const element_match = remaining.match(/^<(dict|array|string)>([\s\S]*?)<\/\1>/)
+    const element_match = remaining.match(plist_parser_array_item_regex) // arrays only support strings, dicts, and arrays.
     if (!element_match) throw new Error('unsupported_tag' as plist_parser_error_types, { cause: { xml, remaining } })
 
-    result.push(parse_xml_part(element_match[0]))
+    result.push(deserialize_xml_part_to_key_value(element_match[0]))
     remaining = remaining.slice(element_match[0].length).trim()
     // sanity check: ensure we made progress
     if (remaining.length === xml_part_length)
-      throw new Error('parse_plist_array: infinite loop detected', { cause: { remaining } })
+      throw new Error('infinite_loop' as plist_parser_error_types, { cause: { remaining_length: remaining.length, xml_length: xml_part_length, remaining, xml } })
   }
 
   return result
 }
 
+const plist_parser_escape_xml_regex = /[&<>"']/g
+const escape_xml_lookup = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&apos;' } as Record<string, string>
 function escape_xml(raw_string: string) {
-  return raw_string.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&apos;' }[character]!))
+  return raw_string.replaceAll(plist_parser_escape_xml_regex, character => (escape_xml_lookup[character]!))
 }
 
+const plist_parser_unescape_xml_regex = /&(amp|lt|gt|quot|apos);/g
+const unescape_xml_lookup = { amp: '&', lt: '<', gt: '>', quot: '"', apos: '\'' } as Record<string, string>
 function unescape_xml(xml_string: string) {
-  return xml_string.replace(/&(amp|lt|gt|quot|apos);/g, (_, entity: string) =>
-    ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: '\'' }[entity]!),
+  return xml_string.replaceAll(plist_parser_unescape_xml_regex, (_, entity: string) =>
+    (unescape_xml_lookup[entity]!),
   )
 }

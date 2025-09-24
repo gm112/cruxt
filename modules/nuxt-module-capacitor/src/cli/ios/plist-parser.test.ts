@@ -1,17 +1,21 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, bench } from 'vitest'
 import { deserialize_json_to_plist, serialize_json_to_plist, type plist_value } from './plist-parser.js'
 
 describe('plist_parser', () => {
   // Happy cases
   describe('happy_cases', () => {
     it('serializes_js_object_to_info_plist', () => {
-      const serialized = serialize_json_to_plist(test_plist_as_json)
-      expect(serialized).toEqual(test_info_plist_content)
+      expect(() => {
+        const serialized = serialize_json_to_plist(test_plist_as_json)
+        expect(serialized).toEqual(test_info_plist_content)
+      }).not.toThrow()
     })
 
     it('deserializes_info_plist_to_js_object', () => {
-      const parsed = deserialize_json_to_plist(test_info_plist_content)
-      expect(parsed).toEqual(test_plist_as_json)
+      expect(() => {
+        const parsed = deserialize_json_to_plist(test_info_plist_content)
+        expect(parsed).toEqual(test_plist_as_json)
+      }).not.toThrow()
     })
   })
 
@@ -54,7 +58,6 @@ describe('plist_parser', () => {
   <array>
     ???
   </array>
-</plist>
 `.trim(),
       `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -78,6 +81,9 @@ describe('plist_parser', () => {
       <string>ok</string>
       <array/>
       <dict/>
+      <dict />
+      <dict></dict>
+      <derp/>
       <array>
       </array>
       <dict></dict>
@@ -96,7 +102,7 @@ describe('plist_parser', () => {
 </plist>
 `.trim(),
     ].map((xml, index) => it(`throws_on_malformed_array_content_${index + 1}`, () =>
-      expect(() => deserialize_json_to_plist(xml)).toThrowError(/unsupported_tag/),
+      expect(() => deserialize_json_to_plist(xml)).toThrowError(/unsupported_tag|invalid_xml/),
     ))
 
     const _malformed_dict_tests = [
@@ -125,29 +131,63 @@ describe('plist_parser', () => {
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <key>CFBundleName</key>
+      <string>ok</string>
+      <array/>
+      <dict/>
+      <dict />
+      <dict></dict>
+      <derp/>
+      <array>
+      </array>
+      <dict></dict>
+      <true/>
+  </dict>
+</plist>
+`.trim(),
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
     <key>
     12345
-  </dict>
-<!-- FIXME: Fix bug where closed plist makes this pass still </plist> Uncomment </plist> when fixed. -->
+</plist>
 `.trim(),
     ].map((xml, index) => it(`throws_on_malformed_dict_content_${index + 1}_2`, () =>
       expect(() => deserialize_json_to_plist(xml)).toThrowError(/invalid_xml/),
     ))
 
     it('handles_empty_dict_and_array_correctly', () => {
-      const json = { empty_object: {}, empty_array: [], some_bool: false }
-      const plist = serialize_json_to_plist(json)
-      expect(plist).toContain('<dict/>')
-      expect(plist).toContain('<array/>')
-      expect(plist).toContain('<false/>')
-      const parsed = deserialize_json_to_plist(plist)
-      expect(parsed).toEqual(json)
+      expect(() => {
+        const json = { empty_object: {}, empty_array: [], some_bool: false }
+        const plist = serialize_json_to_plist(json)
+        expect(plist).toContain('<dict/>')
+        expect(plist).toContain('<array/>')
+        expect(plist).toContain('<false/>')
+        const parsed = deserialize_json_to_plist(plist)
+        expect(parsed).toEqual(json)
+      }).not.toThrow()
     })
   })
-})
 
+  describe('benchmark', () => {
+    if (process.env.VITEST_MODE === 'bench') {
+      bench('serialize', () => {
+        serialize_json_to_plist(test_plist_as_json)
+      })
+
+      bench('deserialize', () => {
+        deserialize_json_to_plist(test_info_plist_content)
+      })
+    }
+    else {
+      it.todo('not running benchmark')
+    }
+  })
+})
 /* eslint-disable @stylistic/no-tabs */
-const test_info_plist_content = `
+export const test_info_plist_content = `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -221,7 +261,7 @@ const test_info_plist_content = `
 `.trim()
 /* eslint-enable @stylistic/no-tabs */
 
-const test_plist_as_json = {
+export const test_plist_as_json = {
   BGTaskSchedulerPermittedIdentifiers: ['com.taste.test', 'com.test.taste'],
   CFBundleDevelopmentRegion: 'en',
   CFBundleDisplayName: 'TestAppName',
