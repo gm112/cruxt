@@ -108,6 +108,7 @@ function parse_plist_array(xml: string) {
   const result: plist_value[] = []
   let remaining = xml.trim()
   while (remaining) {
+    const xml_part_length = remaining.length
     const self_closing_match = remaining.match(/^<(true|false|array|dict)\/>/)
     if (self_closing_match) {
       const tag = self_closing_match[1]
@@ -125,6 +126,9 @@ function parse_plist_array(xml: string) {
 
     result.push(parse_xml_part(element_match[0]))
     remaining = remaining.slice(element_match[0].length).trim()
+    // sanity check: ensure we made progress
+    if (remaining.length === xml_part_length)
+      throw new Error('parse_plist_array: infinite loop detected', { cause: { remaining } })
   }
 
   return result

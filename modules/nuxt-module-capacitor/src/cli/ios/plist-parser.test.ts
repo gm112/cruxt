@@ -1,6 +1,102 @@
 import { describe, it, expect } from 'vitest'
 import { deserialize_json_to_plist, serialize_json_to_plist, type plist_value } from './plist-parser.js'
 
+describe('plist_parser', () => {
+  // Happy cases
+  describe('happy_cases', () => {
+    it('serializes_js_object_to_info_plist', () => {
+      const serialized = serialize_json_to_plist(test_plist_as_json)
+      expect(serialized).toEqual(test_info_plist_content)
+    })
+
+    it('deserializes_info_plist_to_js_object', () => {
+      const parsed = deserialize_json_to_plist(test_info_plist_content)
+      expect(parsed).toEqual(test_plist_as_json)
+    })
+  })
+
+  // Unhappy cases
+  describe('error_handling', () => {
+    const _bad_values = [
+      { CFBundleName: 123 },
+      { CFBundleName: undefined },
+      { Items: ['ok', null] },
+      123,
+    ].map((value, index) => it(`throws_on_unsupported_value_type_${index + 1}`, () => {
+      expect(() => serialize_json_to_plist(value as unknown as plist_value))
+        .toThrowError(/unsupported_value_type/)
+    }))
+
+    it('throws_on_invalid_xml_no_plist_wrapper', () => {
+      const bad_plist = `
+<dict>
+  <key>CFBundleName</key>
+  <string>MyApp</string>
+</dict>
+`
+      expect(() => deserialize_json_to_plist(bad_plist)).toThrowError(/invalid_xml/)
+    })
+
+    const _malformed_arrays_xml = [
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <array>
+    <foobar
+  </array>
+</plist>
+`.trim(),
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <array>
+    ???
+  </array>
+</plist>
+`.trim(),
+    ].map((xml, index) => it(`throws_on_malformed_array_content_${index + 1}`, () =>
+      expect(() => deserialize_json_to_plist(xml)).toThrowError(/unsupported_tag/),
+    ))
+
+    const _malformed_dict_tests = [
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleName</key>
+    <!-- missing value here -->
+  </dict>
+</plist>
+`.trim(),
+      `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleName</key>
+    ???
+  </dict>
+</plist>
+`.trim(),
+    ].map((xml, index) => it(`throws_on_malformed_dict_content_${index + 1}_2`, () =>
+      expect(() => deserialize_json_to_plist(xml)).toThrowError(/invalid_xml/),
+    ))
+
+    it('handles_empty_dict_and_array_correctly', () => {
+      const json = { empty_object: {}, empty_array: [], some_bool: false }
+      const plist = serialize_json_to_plist(json)
+      expect(plist).toContain('<dict/>')
+      expect(plist).toContain('<array/>')
+      expect(plist).toContain('<false/>')
+      const parsed = deserialize_json_to_plist(plist)
+      expect(parsed).toEqual(json)
+    })
+  })
+})
+
 /* eslint-disable @stylistic/no-tabs */
 const test_info_plist_content = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -96,94 +192,10 @@ const test_plist_as_json = {
   UIBackgroundModes: ['audio', 'fetch', 'location', 'processing'],
   UILaunchStoryboardName: 'LaunchScreen',
   UIMainStoryboardFile: 'Main',
-  UIRequiredDeviceCapabilities: [
-    'armv7',
-  ],
+  UIRequiredDeviceCapabilities: ['armv7'],
   UIRequiresFullScreen: true,
   UIStatusBarStyle: 'UIStatusBarStyleDefault',
-  UISupportedInterfaceOrientations: [
-    'UIInterfaceOrientationPortrait',
-  ],
+  UISupportedInterfaceOrientations: ['UIInterfaceOrientationPortrait'],
   UIViewControllerBasedStatusBarAppearance: true,
-  WKAppBoundDomains: [
-    'test.test',
-  ],
+  WKAppBoundDomains: ['test.test'],
 }
-
-describe('plist-parser', () => {
-  it('serializes JS object to Info.plist', () => {
-    const serialized = serialize_json_to_plist(test_plist_as_json)
-    expect(serialized).toEqual(test_info_plist_content)
-  })
-
-  it('deserializes Info.plist to JS object', () => {
-    const parsed = deserialize_json_to_plist(test_info_plist_content)
-    expect(parsed).toEqual(test_plist_as_json)
-  })
-
-  it('throws on unsupported value type (number)', () => {
-    const bad_jason = { CFBundleName: 123 } as unknown as plist_value // Doing type hackery to make TS happy.
-    expect(() => serialize_json_to_plist(bad_jason)).toThrowError(/unsupported_value_type/)
-  })
-
-  it('throws on undefined value in dict', () => {
-    const bad_jason = { CFBundleName: undefined } as unknown as plist_value // Doing type hackery to make TS happy.
-    expect(() => serialize_json_to_plist(bad_jason)).toThrowError(/unsupported_value_type/)
-  })
-
-  it('throws on null value in array', () => {
-    const bad_jason = { Items: ['ok', null] } as unknown as plist_value // Doing type hackery to make TS happy.
-    expect(() => serialize_json_to_plist(bad_jason)).toThrowError(/unsupported_value_type/)
-  })
-
-  it('throws on unsupported value type', () => {
-    expect(() => serialize_json_to_plist(123 as unknown as plist_value)).toThrowError(/unsupported_value_type/)
-  })
-
-  it('throws on invalid XML (no <plist> wrapper)', () => {
-    const bad_plist = `
-  <dict>
-    <key>CFBundleName</key>
-    <string>MyApp</string>
-  </dict>
-  `
-    expect(() => deserialize_json_to_plist(bad_plist)).toThrowError(/invalid_xml/)
-  })
-
-  it('skips keys without values gracefully', () => {
-    const bad_plist_bad_bad = `
-  <?xml version="1.0" encoding="UTF-8"?>
-  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-  <plist version="1.0">
-  <dict>
-    <key>CFBundleName</key>
-    <!-- missing value -->
-  </dict>
-  </plist>
-  `
-    expect(() => deserialize_json_to_plist(bad_plist_bad_bad)).toThrowError(/invalid_xml/)
-  })
-
-  it('handles empty dict and array correctly', () => {
-    const json = { empty_object: {}, empty_array: [], some_bool: false }
-    const plist = serialize_json_to_plist(json)
-    expect(plist).toContain('<dict/>')
-    expect(plist).toContain('<array/>')
-    expect(plist).toContain('<false/>')
-    const parsed = deserialize_json_to_plist(plist)
-    expect(parsed).toEqual(json)
-  })
-
-  it('throws on unsupported tag in array', () => {
-    const bad_plist = `
-  <?xml version="1.0" encoding="UTF-8"?>
-  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-  <plist version="1.0">
-  <array>
-    <foobar/>
-  </array>
-  </plist>
-  `
-    expect(() => deserialize_json_to_plist(bad_plist)).toThrowError(/unsupported_tag/)
-  })
-})
