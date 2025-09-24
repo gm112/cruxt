@@ -86,8 +86,9 @@ function parse_xml_part(xml_string: string): plist_value {
 
   const [, tag, value_content] = match
   const content = value_content ?? ''
+
   if (tag === 'string') return unescape_xml(content)
-  if (tag === 'dict') return parse_plist_dict(content)
+  else if (tag === 'dict') return parse_plist_dict(content)
   return parse_plist_array(content)
 }
 
