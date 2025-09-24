@@ -4,6 +4,8 @@ import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit'
 import type { CapacitorConfig } from '@capacitor/cli'
 import { cleanup_platform_dirs, setup_capacitor_config } from './cli/project.manager.capacitor.js'
 import { read_package_json, try_installing_npm_package } from './cli/project.manager.package-json.js'
+import { handle_ios } from './cli/project.manager.capacitor.ios.js'
+import { handle_android } from './cli/project.manager.capacitor.android.js'
 
 // Module options TypeScript interface definition
 export type CapacitorModuleOptions = {
@@ -31,17 +33,22 @@ export default defineNuxtModule<CapacitorModuleOptions>({
   defaults,
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
+    const resolved_module_options = nuxt.options.cruxt_nuxt_module_capacitor ?? defaults
+    const resolved_capacitor_config = resolved_module_options.capacitor ?? {
+      appId: 'com.example.app',
+      appName: 'Cruxt',
+      webDir: '.output/public',
+    }
 
     const package_json = read_package_json(nuxt.options.rootDir)
     const resolved_package_manager = package_json.packageManager?.split('@')?.[0] ?? undefined
     if (!resolved_package_manager)
-      throw new Error('packageManager not found in package.json. Please configure packageManager in package.json.')
+      throw new Error('packageManager not found in package.json. Please configure packageManager in package.json.', { cause: { package_json, rootDir: nuxt.options.rootDir } })
 
     const required_npm_packages = [
       '@capacitor/cli',
       '@capacitor/core',
     ]
-
     const requested_platforms = new Set([
       ...(options.platforms?.filter(platform => platform === 'android' || platform === 'ios') ? options.platforms : defaults.platforms),
     ])
@@ -50,7 +57,6 @@ export default defineNuxtModule<CapacitorModuleOptions>({
       required_npm_packages.push(`@capacitor/${platform}`)
 
     const removed_platforms: Required<CapacitorModuleOptions>['platforms'] = []
-
     for (const platform of requested_platforms) {
       if (!required_npm_packages.includes(`@capacitor/${platform}`))
         removed_platforms.push(platform)
@@ -60,8 +66,8 @@ export default defineNuxtModule<CapacitorModuleOptions>({
       ...(package_json.dependencies ?? []),
       ...(package_json.devDependencies ?? []),
     ].filter(package_name => !required_npm_packages.includes(package_name))
-
     const packages_to_install = missing_npm_packages.join(' ')
+
     if (missing_npm_packages.length > 0) {
       console.log(`Installing required npm packages: ${packages_to_install}`)
       try_installing_npm_package(nuxt.options.rootDir, packages_to_install, resolved_package_manager)
@@ -78,12 +84,21 @@ export default defineNuxtModule<CapacitorModuleOptions>({
     const capacitor_config_path = join(nuxt.options.rootDir, 'capacitor.config.ts')
     if (!existsSync(capacitor_config_path)) {
       console.log('No capacitor.config.ts found. Creating one...')
-      setup_capacitor_config(capacitor_config_path, nuxt.options.cruxt_nuxt_module_capacitor?.capacitor ?? {
-        appId: 'com.example.app',
-        appName: 'Cruxt',
-        webDir: '.output/public',
-      })
+      setup_capacitor_config(capacitor_config_path, resolved_capacitor_config)
     }
+
+    const handle_options = {
+      module_options: {
+        ...resolved_module_options,
+        capacitor: resolved_capacitor_config,
+      },
+      package_json,
+    }
+
+    if (requested_platforms.has('ios'))
+      handle_ios(nuxt.options.rootDir, handle_options)
+    else if (requested_platforms.has('android'))
+      handle_android(nuxt.options.rootDir, handle_options)
 
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
     addPlugin(resolver.resolve('./runtime/plugin'))

@@ -1,5 +1,5 @@
 import { existsSync, writeFileSync } from 'node:fs'
-import { json_to_plist, read_info_plist_to_object, write_plist_to_file, type plist_value } from './ios/plist-parser.js'
+import { json_to_plist, read_info_plist_to_object, type plist_value } from './ios/plist-parser.js'
 import { join } from 'node:path'
 import type { CapacitorModuleOptions } from '../module.js'
 

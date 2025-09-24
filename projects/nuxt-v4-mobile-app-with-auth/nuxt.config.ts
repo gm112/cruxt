@@ -3,14 +3,14 @@ export default defineNuxtConfig({
   extends: ['@cruxt/auth'],
   modules: ['@cruxt/nuxt-module-capacitor'],
 
-  // typescript: {
-  //   typeCheck: true,
-  // },
-  cruxt_nuxt_module_capacitor: {},
-
   devtools: {
     timeline: {
       enabled: true,
     },
   },
+
+  // typescript: {
+  //   typeCheck: true,
+  // },
+  cruxt_nuxt_module_capacitor: {},
 })
