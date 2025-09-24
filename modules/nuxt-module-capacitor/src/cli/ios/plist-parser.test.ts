@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { deserialize_json_to_plist, serialize_json_to_plist, type plist_value } from './plist-parser.js'
+
 /* eslint-disable @stylistic/no-tabs */
 const test_info_plist_content = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -110,29 +111,43 @@ const test_plist_as_json = {
 }
 
 describe('plist-parser', () => {
-  it('parses Info.plist to JS object', () => {
-    const parsed = deserialize_json_to_plist(test_info_plist_content)
-    expect(parsed).toEqual(test_plist_as_json)
-  })
-
   it('serializes JS object to Info.plist', () => {
     const serialized = serialize_json_to_plist(test_plist_as_json)
     expect(serialized).toEqual(test_info_plist_content)
   })
 
-  it('throws on invalid XML (no <plist> wrapper)', () => {
-    const badPlist = `
-  <dict>
-    <key>CFBundleName</key>
-    <string>MyApp</string>
-  </dict>
-  `
-    expect(() => deserialize_json_to_plist(badPlist)).toThrowError(/invalid_xml/)
+  it('deserializes Info.plist to JS object', () => {
+    const parsed = deserialize_json_to_plist(test_info_plist_content)
+    expect(parsed).toEqual(test_plist_as_json)
   })
 
   it('throws on unsupported value type (number)', () => {
     const bad_jason = { CFBundleName: 123 } as unknown as plist_value // Doing type hackery to make TS happy.
     expect(() => serialize_json_to_plist(bad_jason)).toThrowError(/unsupported_value_type/)
+  })
+
+  it('throws on undefined value in dict', () => {
+    const bad_jason = { CFBundleName: undefined } as unknown as plist_value // Doing type hackery to make TS happy.
+    expect(() => serialize_json_to_plist(bad_jason)).toThrowError(/unsupported_value_type/)
+  })
+
+  it('throws on null value in array', () => {
+    const bad_jason = { Items: ['ok', null] } as unknown as plist_value // Doing type hackery to make TS happy.
+    expect(() => serialize_json_to_plist(bad_jason)).toThrowError(/unsupported_value_type/)
+  })
+
+  it('throws on unsupported value type', () => {
+    expect(() => serialize_json_to_plist(123 as unknown as plist_value)).toThrowError(/unsupported_value_type/)
+  })
+
+  it('throws on invalid XML (no <plist> wrapper)', () => {
+    const bad_plist = `
+  <dict>
+    <key>CFBundleName</key>
+    <string>MyApp</string>
+  </dict>
+  `
+    expect(() => deserialize_json_to_plist(bad_plist)).toThrowError(/invalid_xml/)
   })
 
   it('skips keys without values gracefully', () => {
@@ -149,13 +164,26 @@ describe('plist-parser', () => {
     expect(() => deserialize_json_to_plist(bad_plist_bad_bad)).toThrowError(/invalid_xml/)
   })
 
-  it('throws on undefined value in dict', () => {
-    const bad_jason = { CFBundleName: undefined } as unknown as plist_value // Doing type hackery to make TS happy.
-    expect(() => serialize_json_to_plist(bad_jason)).toThrowError(/unsupported_value_type/)
+  it('handles empty dict and array correctly', () => {
+    const json = { empty_object: {}, empty_array: [], some_bool: false }
+    const plist = serialize_json_to_plist(json)
+    expect(plist).toContain('<dict/>')
+    expect(plist).toContain('<array/>')
+    expect(plist).toContain('<false/>')
+    const parsed = deserialize_json_to_plist(plist)
+    expect(parsed).toEqual(json)
   })
 
-  it('throws on null value in array', () => {
-    const bad_jason = { Items: ['ok', null] } as unknown as plist_value // Doing type hackery to make TS happy.
-    expect(() => serialize_json_to_plist(bad_jason)).toThrowError(/unsupported_value_type/)
+  it('throws on unsupported tag in array', () => {
+    const bad_plist = `
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <array>
+    <foobar/>
+  </array>
+  </plist>
+  `
+    expect(() => deserialize_json_to_plist(bad_plist)).toThrowError(/unsupported_tag/)
   })
 })

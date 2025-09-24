@@ -46,6 +46,7 @@
     "@nuxt/schema": "catalog:",
     "@nuxt/test-utils": "catalog:",
     "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "changelogen": "catalog:",
     "eslint": "catalog:",
     "nuxt": "catalog:",

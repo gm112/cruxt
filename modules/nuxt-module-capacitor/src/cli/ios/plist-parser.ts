@@ -1,14 +1,5 @@
 export type plist_parser_error_types = 'unsupported_value_type' | 'unsupported_tag' | 'invalid_xml' | 'info_plist_not_found'
 export type plist_value = string | boolean | plist_value[] | { [key: string]: plist_value }
-function escape_xml(raw_string: string) {
-  return raw_string.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&apos;' }[character]!))
-}
-
-function unescape_xml(xml_string: string) {
-  return xml_string.replace(/&(amp|lt|gt|quot|apos);/g, (_, entity: string) =>
-    ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: '\'' }[entity]!),
-  )
-}
 
 /**
  * Serialize JS object to plist XML
@@ -56,28 +47,27 @@ function serialize_plist(value: plist_value, depth = 0): string {
     return `${indent}<array>\n${items}\n${indent}</array>`
   }
 
-  if (typeof value === 'object' && value !== null) {
-    const keys = Object.keys(value)
-    if (keys.length === 0) return `${indent}<dict/>`
+  if (typeof value !== 'object' || value === null || value === undefined)
+    throw new Error('unsupported_value_type' as plist_parser_error_types, {
+      cause: { value, depth, type: typeof value },
+    })
 
-    return `${indent}<dict>\n${
-      keys
-        .map((key) => {
-          const plist_item_value = (value as Record<string, plist_value>)[key]
-          if (plist_item_value === undefined || plist_item_value === null)
-            throw new Error('unsupported_value_type' as plist_parser_error_types, {
-              cause: { key, value: plist_item_value, reason: 'undefined or null in dict' },
-            })
+  const keys = Object.keys(value)
+  if (keys.length === 0) return `${indent}<dict/>`
 
-          return `${indent}\t<key>${escape_xml(key)}</key>\n${serialize_plist(plist_item_value, depth + 1)}`
-        })
-        .join('\n')
-    }\n${indent}</dict>`
-  }
+  return `${indent}<dict>\n${
+    keys
+      .map((key) => {
+        const plist_item_value = (value as Record<string, plist_value>)[key]
+        if (plist_item_value === undefined || plist_item_value === null)
+          throw new Error('unsupported_value_type' as plist_parser_error_types, {
+            cause: { key, value: plist_item_value, reason: 'undefined or null in dict' },
+          })
 
-  throw new Error('unsupported_value_type' as plist_parser_error_types, {
-    cause: { value, depth, type: typeof value },
-  })
+        return `${indent}\t<key>${escape_xml(key)}</key>\n${serialize_plist(plist_item_value, depth + 1)}`
+      })
+      .join('\n')
+  }\n${indent}</dict>`
 }
 
 function parse_xml_part(xml_string: string): plist_value {
@@ -100,23 +90,21 @@ function parse_xml_part(xml_string: string): plist_value {
   return parse_plist_array(content)
 }
 
-function parse_plist_dict(xml: string): { [key: string]: plist_value } {
-  const result: { [key: string]: plist_value } = {}
+function parse_plist_dict(xml: string) {
+  const result: Record<string, plist_value> = {}
   const parts: string[] = xml.split(/<key>([\s\S]*?)<\/key>/)?.slice(1) ?? []
 
   for (let index = 0; index + 1 < parts.length; index += 2) {
     const [key_part, value_part] = parts.slice(index, index + 2)
     const value_xml = value_part?.trim()
     if (typeof key_part !== 'string' || !value_xml) continue
-
-    const key = unescape_xml(key_part)
-    result[key] = parse_xml_part(value_xml)
+    result[unescape_xml(key_part)] = parse_xml_part(value_xml)
   }
 
   return result
 }
 
-function parse_plist_array(xml: string): plist_value[] {
+function parse_plist_array(xml: string) {
   const result: plist_value[] = []
   let remaining = xml.trim()
   while (remaining) {
@@ -133,10 +121,21 @@ function parse_plist_array(xml: string): plist_value[] {
     }
 
     const element_match = remaining.match(/^<(dict|array|string)>([\s\S]*?)<\/\1>/)
-    if (!element_match) break
+    if (!element_match) throw new Error('unsupported_tag' as plist_parser_error_types, { cause: { xml, remaining } })
 
     result.push(parse_xml_part(element_match[0]))
     remaining = remaining.slice(element_match[0].length).trim()
   }
+
   return result
+}
+
+function escape_xml(raw_string: string) {
+  return raw_string.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&apos;' }[character]!))
+}
+
+function unescape_xml(xml_string: string) {
+  return xml_string.replace(/&(amp|lt|gt|quot|apos);/g, (_, entity: string) =>
+    ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: '\'' }[entity]!),
+  )
 }
