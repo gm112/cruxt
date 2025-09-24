@@ -1,8 +1,9 @@
-import { existsSync, writeFileSync } from 'node:fs'
-import { json_to_plist, read_info_plist_to_object, type plist_value } from './ios/plist-parser.js'
-import { join } from 'node:path'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { deserialize_json_to_plist, serialize_json_to_plist, type plist_value } from './ios/plist-parser.js'
+import { join, resolve } from 'node:path'
 import type { CapacitorModuleOptions } from '../module.js'
 
+type module_error_types = 'info_plist_not_found'
 interface handle_ios_options {
   module_options: Required<Pick<CapacitorModuleOptions, 'capacitor'>>
   package_json: Record<string, unknown>
@@ -37,5 +38,17 @@ export function handle_ios(working_directory: string, options: handle_ios_option
  * @param output_path - Path to write Info.plist file
  */
 function write_plist_to_file(json: plist_value, output_path: string): void {
-  writeFileSync(output_path, json_to_plist(json), 'utf8')
+  writeFileSync(output_path, serialize_json_to_plist(json), 'utf8')
+}
+
+/**
+ * Read Info.plist file and parse it to a JS object
+ * @param info_plist_path - Path to Info.plist file
+ * @returns JS object representation of Info.plist file
+ *
+ */
+function read_info_plist_to_object(info_plist_path: string): Record<string, plist_value> {
+  const file_path = resolve(join(info_plist_path))
+  if (!existsSync(file_path)) throw new Error('info_plist_not_found' as module_error_types, { cause: file_path })
+  return deserialize_json_to_plist(readFileSync(file_path, 'utf8')) as Record<string, plist_value>
 }

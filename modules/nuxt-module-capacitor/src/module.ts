@@ -7,6 +7,7 @@ import { read_package_json, try_installing_npm_package } from './cli/project.man
 import { handle_ios } from './cli/project.manager.capacitor.ios.js'
 import { handle_android } from './cli/project.manager.capacitor.android.js'
 
+type warn_types = 'package_manager_not_found'
 // Module options TypeScript interface definition
 export type CapacitorModuleOptions = {
   capacitor?: CapacitorConfig
@@ -42,8 +43,12 @@ export default defineNuxtModule<CapacitorModuleOptions>({
 
     const package_json = read_package_json(nuxt.options.rootDir)
     const resolved_package_manager = package_json.packageManager?.split('@')?.[0] ?? undefined
-    if (!resolved_package_manager)
-      throw new Error('packageManager not found in package.json. Please configure packageManager in package.json.', { cause: { package_json, rootDir: nuxt.options.rootDir } })
+    if (!resolved_package_manager) {
+      console.error('package_manager_not_found' as warn_types, { cause: { package_json, rootDir: nuxt.options.rootDir } })
+      console.warn('Skipping @cruxt/nuxt-module-capacitor setup. Please configure packageManager in package.json.')
+      return
+    }
+    // throw new Error('packageManager not found in package.json. Please configure packageManager in package.json.', { cause: { package_json, rootDir: nuxt.options.rootDir } })
 
     const required_npm_packages = [
       '@capacitor/cli',
