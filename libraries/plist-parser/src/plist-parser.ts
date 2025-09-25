@@ -12,7 +12,7 @@
  * Notes for things that are not supported:
  * - Does not care about UTF-16 encoding support. Untested, but might work fine.
  * - Large files probably won't work due to the use of using regex to extract the <plist> data. Changing deserialization to use a streaming parser would address this if it is an issue.
- * - Comments are ignored and will no-op/be removed when serializing.
+ * - Comments are ignored and will no-op/be removed when deserializing.
  * - Binary data is ignored, and is untested.
  * - Dates are ignored, and is untested. At the moment I believe it would resolve to a regular string.
  * - All unknown key dictionaries are not supported, and may be treated as a regular JSON object, which may mess up the structure of the plist.
