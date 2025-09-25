@@ -93,6 +93,7 @@ describe('plist_parser', () => {
         { CFBundleName: function () {} },
         { CFBundleName: undefined },
         { Items: ['ok', null] },
+        { CFBundleName: new Uint8Array([1, 2, 3]) },
         123,
       ].map((value, index) => it(`throws_on_unsupported_value_type_${index + 1}`, () => {
         expect(() =>
@@ -184,6 +185,14 @@ describe('plist_parser', () => {
   </array>
 </plist>
 `.trim(),
+        `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <array>
+      <data>123</data>
+  </array>
+</plist>
+`.trim(),
       ].map((xml, index) => it(`throws on malformed array content_${index + 1}`, () =>
         expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/unsupported_tag|invalid_xml/),
       ))
@@ -229,6 +238,68 @@ describe('plist_parser', () => {
       ].map((xml, index) => it(`throws on malformed dict content_${index + 1}`, () =>
         expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
       ))
+
+      const _malformed_dates_xml = [
+        `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleName</key>
+    <date>2023-09-25T14:60:00Z</date>
+  </dict>
+</plist>
+`.trim(),
+      ].map((xml, index) => it(`throws on malformed date content_${index + 1}`, () =>
+        expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
+      ))
+
+      const _malformed_reals_xml = [
+        `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleName</key>
+    <real>123.pizza</real>
+  </dict>
+</plist>
+`.trim(),
+      ].map((xml, index) => it(`throws on malformed real content_${index + 1}`, () =>
+        expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
+      ))
+
+      const _malformed_numbers_xml = [
+        `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleName</key>
+    <integer>123.pizza</integer>
+  </dict>
+</plist>
+`.trim(),
+      ].map((xml, index) => it(`throws on malformed number content_${index + 1}`, () =>
+        expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
+      ))
+
+      const _malformed_booleans_xml = [
+        `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleName</key>
+    <true>123.pizza</true>
+  </dict>
+</plist>
+`.trim(),
+      ].map((xml, index) => it(`throws on malformed boolean content_${index + 1}`, () =>
+        expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
+      ))
+
+      //
     })
   })
 })

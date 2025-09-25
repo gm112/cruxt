@@ -5,23 +5,27 @@
  * @see {serialize_xml_to_plist_object}
  * @see {deserialize_plist_xml_to_plist_object}
  * @link https://code.google.com/archive/p/networkpx/wikis/PlistSpec.wiki
+ * @link https://www.apple.com/DTDs/PropertyList-1.0.dtd
  * @description A single-file zero dependency parser for serializing and deserializing Apple Info.plist files. Supprts only XML formatted plists.
  * Only supports plists with a single root element, that contain only string, number, boolean, reals, dates, array(also nested), and dictionary(also nested) values.
- * Attempts to conform to Apple's formatting and specifications for plists in the parts of the spec that are supported.
+ * Attempts to conform to Apple's formatting and specifications for plists in the parts of the spec that are supported. Comments are ignored and will no-op/be removed when deserializing.
  *
  * Notes for things that are not supported:
  * - Does not care about UTF-16 encoding support. Untested, but might work fine.
  * - Large files probably won't work due to the use of using regex to extract the <plist> data. Changing deserialization to use a streaming parser would address this if it is an issue.
- * - Comments are ignored and will no-op/be removed when deserializing.
  * - Binary data is ignored, and is untested.
- * - All unknown key dictionaries are not supported, and may be treated as a regular JSON object, which may mess up the structure of the plist.
  */
 
 /**
  * Error types that plist_parser can throw.
  */
 export type plist_parser_error_types = 'unsupported_value_type' | 'unsupported_tag' | 'invalid_xml' | 'info_plist_not_found' | 'infinite_loop'
-export type plist_value = string | Date | number | boolean | plist_value[] | { [key: string]: plist_value }
+/**
+ * The plist value type.
+ * @see https://www.apple.com/DTDs/PropertyList-1.0.dtd
+ * @todo Add support for binary data.
+ */
+export type plist_value = string | Uint8Array | Date | number | boolean | plist_value[] | { [key: string]: plist_value }
 
 /**
  * Serialize JS object to plist XML
@@ -82,6 +86,8 @@ function serialize_json_to_plist_item_xml(value: plist_value, depth = 0): string
       else if (value !== null && value !== undefined)
         if (value instanceof Date)
           return serialize_date(value as Date, indent)
+        else if (value instanceof Uint8Array)
+          return serialize_data(value as Uint8Array, indent)
         else
           return serialize_object(value as Record<string, plist_value>, indent, depth)
   }
@@ -110,6 +116,10 @@ function serialize_real(value: number, indent: string) {
 
 function serialize_boolean(value: boolean, indent: string) {
   return `${indent}${value ? '<true/>' : '<false/>'}`
+}
+
+function serialize_data(value: Uint8Array, _indent: string): string {
+  throw new Error('unsupported_value_type' as plist_parser_error_types, { cause: { value, type: typeof value } })
 }
 
 function serialize_array(value: plist_value[], indent: string, depth: number) {
@@ -153,27 +163,37 @@ function naive_ends_with_closing_tag(xml_fragment: string, _element_name: string
   return open !== -1 && xml_fragment[open + 1] === '/' && xml_fragment[xml_fragment.length - 1] === '>'
 }
 
-const plist_date_iso8601_regex = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/
 function deserialize_plist_date_to_date_object(xml_fragment: string) {
-  const match = xml_fragment.match(plist_date_iso8601_regex)
-  if (!match) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment } })
+  const timestampe_date = new Date(xml_fragment)
+  if (timestampe_date.toString() === 'Invalid Date') throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment } })
 
-  const [, year, month, day, hour, minute, second] = match
-  return new Date(Date.UTC(
-    Number(year),
-    Number(month) - 1,
-    Number(day),
-    Number(hour),
-    Number(minute),
-    Number(second),
-  ))
+  return timestampe_date
+}
+
+function deserialize_plist_integer_to_number_object(content: string) {
+  const number_value = Number(content)
+  if (Number.isSafeInteger(number_value))
+    return parseInt(content!)
+
+  throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: content } })
+}
+
+function deserialize_plist_real_to_number_object(content: string) {
+  const number_value = Number(content)
+  if (Number.isFinite(number_value))
+    return number_value
+
+  throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: content } })
+}
+
+function deserialize_plist_data_to_data_object(content: string): plist_value {
+  throw new Error('unsupported_tag' as plist_parser_error_types, { cause: { xml: content } })
 }
 
 function deserialize_xml_fragment_to_plist_value_object(xml_fragment: string): plist_value {
   if (xml_fragment === '<true/>' || xml_fragment === '<false/>') return xml_fragment === '<true/>'
   else if (xml_fragment === '<array/>') return []
   else if (xml_fragment === '<dict/>') return {}
-  else if (xml_fragment === '<date/>') return new Date(0)
   else if (!naive_ends_with_closing_tag(xml_fragment, '')) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment } })
 
   const match = xml_fragment.match(plist_parser_regex)
@@ -188,19 +208,12 @@ function deserialize_xml_fragment_to_plist_value_object(xml_fragment: string): p
   else if (tag === 'array') return deserialize_plist_array_to_object(content!)
   else if (tag === 'date') return deserialize_plist_date_to_date_object(content!)
   else if (tag === 'true' || tag === 'false') return tag === 'true'
-  else if (tag === 'integer') {
-    const number_value = Number(content!)
-    if (Number.isSafeInteger(number_value))
-      return parseInt(content!)
-  }
-  else if (tag === 'real') {
-    const number_value = Number(content!)
-    if (Number.isFinite(number_value))
-      return number_value
-  }
+  else if (tag === 'integer') return deserialize_plist_integer_to_number_object(content!)
+  else if (tag === 'real') return deserialize_plist_real_to_number_object(content!)
+  else if (tag === 'data') return deserialize_plist_data_to_data_object(content!)
 
   throw new Error('invalid_xml' as plist_parser_error_types, {
-    cause: { xml: xml_fragment },
+    cause: { xml: xml_fragment, tag },
   })
 }
 
