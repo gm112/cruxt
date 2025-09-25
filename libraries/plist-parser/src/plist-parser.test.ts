@@ -291,6 +291,8 @@ export const test_info_plist_content = `
 	<array>
 		<string>test.test</string>
 	</array>
+	<key>TestNumber</key>
+	<integer>123</integer>
 </dict>
 </plist>
 `.trim()
@@ -341,4 +343,5 @@ export const test_plist_as_json = {
   UISupportedInterfaceOrientations: ['UIInterfaceOrientationPortrait'],
   UIViewControllerBasedStatusBarAppearance: true,
   WKAppBoundDomains: ['test.test'],
+  TestNumber: 123,
 }

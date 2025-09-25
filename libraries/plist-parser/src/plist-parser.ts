@@ -5,7 +5,7 @@
  * @see {serialize_xml_to_plist_object}
  * @see {deserialize_plist_xml_to_plist_object}
  * @link https://code.google.com/archive/p/networkpx/wikis/PlistSpec.wiki
- * @description A single-file zero dependency parser for serializing and deserializing Apple Info.plist files.
+ * @description A single-file zero dependency parser for serializing and deserializing Apple Info.plist files. Supprts only XML formatted plists.
  * Only supports plists with a single root element, that contain
  * only string, number, boolean, array(also nested), and dictionary(also nested) values. Attempts to conform to
  * Apple's formatting and specifications for plists in the parts of the spec that are supported.
@@ -88,7 +88,7 @@ function serialize_string(value: string, indent: string) {
 
 // Supporting real values is not supported by this parser, we only support numbers.
 function serialize_number(value: number, indent: string) {
-  return `${indent}<number>${value}</number>`
+  return `${indent}<integer>${value}</integer>`
 }
 
 function serialize_boolean(value: boolean, indent: string) {
@@ -129,7 +129,7 @@ function serialize_object(value: Record<string, plist_value>, indent: string, de
 }
 
 /* Deserialization */
-const plist_parser_regex = /<(dict|array|string|number)>([\s\S]*?)<\/\1>/
+const plist_parser_regex = /<(dict|array|string|integer)>([\s\S]*?)<\/\1>/
 function naive_ends_with_closing_tag(xml_fragment: string, _element_name: string) {
   const open = xml_fragment.lastIndexOf('<')
   return open !== -1 && xml_fragment[open + 1] === '/' && xml_fragment[xml_fragment.length - 1] === '>'
@@ -151,8 +151,12 @@ function deserialize_xml_fragment_to_plist_value_object(xml_fragment: string): p
   if (tag === 'string') return unescape_xml(content!)
   else if (tag === 'dict') return deserialize_plist_dict_to_object(content!)
   else if (tag === 'array') return deserialize_plist_array_to_object(content!)
-  else if (tag === 'number' && Number.isSafeInteger(Number(content))) return parseInt(content!) // Real's probably could be supported if we added a check for if the value is a fixed int or not.
   else if (tag === 'true' || tag === 'false') return tag === 'true'
+  else if (tag === 'integer') {
+    const number_value = Number(content!)
+    if (Number.isSafeInteger(number_value))
+      return parseInt(content!) // Real's probably could be supported if we added a check for if the value is a fixed int or not.
+  }
 
   throw new Error('invalid_xml' as plist_parser_error_types, {
     cause: { xml: xml_fragment },
@@ -167,7 +171,7 @@ function deserialize_plist_dict_to_object(xml_fragment: string) {
   // Starting the loop at 1 because we do not want to look at the first element.
   for (let index = 1; index + 1 < parts.length; index += 2) {
     const key_part = parts[index]
-    if (typeof key_part !== 'string')
+    if (typeof key_part !== 'string' || result[key_part])
       throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment, key_part, value_part: parts[index + 1] } })
 
     const value_part = parts[index + 1]
@@ -180,27 +184,16 @@ function deserialize_plist_dict_to_object(xml_fragment: string) {
   return result
 }
 
-const plist_parser_array_self_closing_tag_regex = /<(dict|array|string|true|false)\/>/
 function deserialize_plist_array_to_object(xml_fragment: string) {
   const result: plist_value[] = []
   let remaining = xml_fragment.trim()
 
   while (remaining) {
     const xml_part_length = remaining.length
-    const [content, tag] = remaining.match(plist_parser_array_self_closing_tag_regex) ?? []
-
-    if (content) {
-      if (tag === 'array') result.push([])
-      else if (tag === 'dict') result.push({})
-
-      remaining = remaining.substring(content.length).trim()
-      continue
-    }
-
     if (!plist_parser_regex.test(remaining))
       throw new Error('unsupported_tag' as plist_parser_error_types, { cause: { xml: xml_fragment, remaining } })
 
-    const [item] = remaining.match(plist_parser_regex)! // arrays only support booleans, strings, dicts, and arrays.
+    const [item] = remaining.match(plist_parser_regex)!
     result.push(deserialize_xml_fragment_to_plist_value_object(item))
     remaining = remaining.substring(item.length).trim()
     // sanity check: ensure we made progress
