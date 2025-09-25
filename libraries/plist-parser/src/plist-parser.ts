@@ -6,16 +6,15 @@
  * @see {deserialize_plist_xml_to_plist_object}
  * @link https://code.google.com/archive/p/networkpx/wikis/PlistSpec.wiki
  * @description A single-file zero dependency parser for serializing and deserializing Apple Info.plist files. Supprts only XML formatted plists.
- * Only supports plists with a single root element, that contain
- * only string, number, boolean, array(also nested), and dictionary(also nested) values. Attempts to conform to
- * Apple's formatting and specifications for plists in the parts of the spec that are supported.
+ * Only supports plists with a single root element, that contain only string, number, boolean, array(also nested), and dictionary(also nested) values.
+ * Attempts to conform to Apple's formatting and specifications for plists in the parts of the spec that are supported.
  *
  * Notes for things that are not supported:
  * - Does not care about UTF-16 encoding support. Untested, but might work fine.
  * - Large files probably won't work due to the use of using regex to extract the <plist> data. Changing deserialization to use a streaming parser would address this if it is an issue.
  * - Comments are ignored and will no-op/be removed when serializing.
- * - Binary data is ignored, and will throw an error if encountered.
- * - Dates are ignored, and will throw an error if encountered.
+ * - Binary data is ignored, and is untested.
+ * - Dates are ignored, and is untested. At the moment I believe it would resolve to a regular string.
  * - All unknown key dictionaries are not supported, and may be treated as a regular JSON object, which may mess up the structure of the plist.
  */
 
@@ -27,20 +26,20 @@ export type plist_value = string | number | boolean | plist_value[] | { [key: st
 
 /**
  * Serialize JS object to plist XML
- * @param json - JS object to serialize
+ * @param jason - JS object to serialize
  * @returns plist XML string
  */
-export function serialize_xml_to_plist_object(json: plist_value): string {
-  if (typeof json !== 'object' || json === null || json === undefined)
+export function serialize_xml_to_plist_object(jason: plist_value): string {
+  if (typeof jason !== 'object' || jason === null || jason === undefined)
     throw new Error('unsupported_value_type' as plist_parser_error_types, {
-      cause: { value: json, type: typeof json },
+      cause: { value: jason, type: typeof jason },
     })
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
     '<plist version="1.0">',
-    serialize_json_to_plist_item_xml(json, 0),
+    serialize_json_to_plist_item_xml(jason, 0),
     '</plist>',
   ].join('\n')
 }
@@ -55,6 +54,7 @@ const plist_comment_block_regex = /<!--[\s\S]*?-->/g
 export function deserialize_plist_xml_to_plist_object(xml: string): plist_value {
   const [,match] = xml.match(plist_parser_xml_regex) ?? []
   if (!match) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml } })
+
   return deserialize_xml_fragment_to_plist_value_object(
     (plist_comment_block_regex.test(match)
       ? match.replaceAll(plist_comment_block_regex, '')
@@ -97,6 +97,7 @@ function serialize_boolean(value: boolean, indent: string) {
 
 function serialize_array(value: plist_value[], indent: string, depth: number) {
   if (value.length === 0) return `${indent}<array/>`
+
   return `${indent}<array>\n${
     value.map((plist_item_value) => {
       if (plist_item_value === undefined || plist_item_value === null)
@@ -155,7 +156,7 @@ function deserialize_xml_fragment_to_plist_value_object(xml_fragment: string): p
   else if (tag === 'integer') {
     const number_value = Number(content!)
     if (Number.isSafeInteger(number_value))
-      return parseInt(content!) // Real's probably could be supported if we added a check for if the value is a fixed int or not.
+      return parseInt(content!) // Reals probably could be supported if we added a check for if the value is a fixed int or not.
   }
 
   throw new Error('invalid_xml' as plist_parser_error_types, {
@@ -190,10 +191,9 @@ function deserialize_plist_array_to_object(xml_fragment: string) {
 
   while (remaining) {
     const xml_part_length = remaining.length
-    if (!plist_parser_regex.test(remaining))
-      throw new Error('unsupported_tag' as plist_parser_error_types, { cause: { xml: xml_fragment, remaining } })
+    const [item] = remaining.match(plist_parser_regex) ?? []
+    if (!item) throw new Error('unsupported_tag' as plist_parser_error_types, { cause: { xml: xml_fragment, remaining } })
 
-    const [item] = remaining.match(plist_parser_regex)!
     result.push(deserialize_xml_fragment_to_plist_value_object(item))
     remaining = remaining.substring(item.length).trim()
     // sanity check: ensure we made progress

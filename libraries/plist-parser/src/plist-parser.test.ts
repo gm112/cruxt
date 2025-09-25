@@ -1,4 +1,4 @@
-import { describe, it, expect, bench } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { deserialize_plist_xml_to_plist_object, serialize_xml_to_plist_object, type plist_value } from './plist-parser.js'
 
 describe('plist_parser', () => {
@@ -204,21 +204,6 @@ describe('plist_parser', () => {
         expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
       ))
     })
-  })
-
-  describe('benchmark', () => {
-    if (process.env.VITEST_MODE === 'bench') {
-      bench('serialize', () => {
-        serialize_xml_to_plist_object(test_plist_as_json)
-      })
-
-      bench('deserialize', () => {
-        deserialize_plist_xml_to_plist_object(test_info_plist_content)
-      })
-    }
-    else {
-      it.todo('not running benchmark')
-    }
   })
 })
 /* eslint-disable @stylistic/no-tabs */
