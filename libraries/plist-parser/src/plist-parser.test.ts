@@ -1,20 +1,26 @@
 import { describe, it, expect, bench } from 'vitest'
-import { deserialize_json_to_plist, serialize_json_to_plist, type plist_value } from './plist-parser.js'
+import { deserialize_plist_xml_to_plist_object, serialize_xml_to_plist_object, type plist_value } from './plist-parser.js'
 
 describe('plist_parser', () => {
   // Happy cases
   describe('happy_cases', () => {
     it('serializes_js_object_to_info_plist', () => {
       expect(() => {
-        const serialized = serialize_json_to_plist(test_plist_as_json)
+        const serialized = serialize_xml_to_plist_object(test_plist_as_json)
         expect(serialized).toEqual(test_info_plist_content)
       }).not.toThrow()
     })
 
     it('deserializes_info_plist_to_js_object', () => {
       expect(() => {
-        const parsed = deserialize_json_to_plist(test_info_plist_content)
-        expect(parsed).toEqual(test_plist_as_json)
+        const parsed = deserialize_plist_xml_to_plist_object(test_info_plist_content)
+        try {
+          expect(parsed).toEqual(test_plist_as_json)
+        }
+        catch (error) {
+          console.log(error)
+          throw error
+        }
       }).not.toThrow()
     })
   })
@@ -22,12 +28,13 @@ describe('plist_parser', () => {
   // Unhappy cases
   describe('error_handling', () => {
     const _bad_values = [
-      { CFBundleName: 123 },
+      { CFBundleName: function () {} },
       { CFBundleName: undefined },
       { Items: ['ok', null] },
       123,
     ].map((value, index) => it(`throws_on_unsupported_value_type_${index + 1}`, () => {
-      expect(() => serialize_json_to_plist(value as unknown as plist_value))
+      expect(() =>
+        serialize_xml_to_plist_object(value as unknown as plist_value))
         .toThrowError(/unsupported_value_type/)
     }))
 
@@ -38,7 +45,7 @@ describe('plist_parser', () => {
   <string>MyApp</string>
 </dict>
 `
-      expect(() => deserialize_json_to_plist(bad_plist)).toThrowError(/invalid_xml/)
+      expect(() => deserialize_plist_xml_to_plist_object(bad_plist)).toThrowError(/invalid_xml/)
     })
 
     const _malformed_arrays_xml = [
@@ -88,7 +95,7 @@ describe('plist_parser', () => {
 </plist>
 `.trim(),
     ].map((xml, index) => it(`throws_on_malformed_array_content_${index + 1}`, () =>
-      expect(() => deserialize_json_to_plist(xml)).toThrowError(/unsupported_tag|invalid_xml/),
+      expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/unsupported_tag|invalid_xml/),
     ))
 
     const _malformed_dict_tests = [
@@ -130,17 +137,17 @@ describe('plist_parser', () => {
     12345
 `.trim(),
     ].map((xml, index) => it(`throws_on_malformed_dict_content_${index + 1}_2`, () =>
-      expect(() => deserialize_json_to_plist(xml)).toThrowError(/invalid_xml/),
+      expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
     ))
 
     it('handles_empty_dict_and_array_correctly', () => {
       expect(() => {
         const json = { empty_object: {}, empty_array: [], some_bool: false }
-        const plist = serialize_json_to_plist(json)
+        const plist = serialize_xml_to_plist_object(json)
         expect(plist).toContain('<dict/>')
         expect(plist).toContain('<array/>')
         expect(plist).toContain('<false/>')
-        const parsed = deserialize_json_to_plist(plist)
+        const parsed = deserialize_plist_xml_to_plist_object(plist)
         expect(parsed).toEqual(json)
       }).not.toThrow()
     })
@@ -149,11 +156,11 @@ describe('plist_parser', () => {
   describe('benchmark', () => {
     if (process.env.VITEST_MODE === 'bench') {
       bench('serialize', () => {
-        serialize_json_to_plist(test_plist_as_json)
+        serialize_xml_to_plist_object(test_plist_as_json)
       })
 
       bench('deserialize', () => {
-        deserialize_json_to_plist(test_info_plist_content)
+        deserialize_plist_xml_to_plist_object(test_info_plist_content)
       })
     }
     else {

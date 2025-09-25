@@ -1,13 +1,15 @@
 import { describe, bench } from 'vitest'
-import { deserialize_json_to_plist, serialize_json_to_plist } from './plist-parser.js'
+import { deserialize_plist_xml_to_plist_object, serialize_xml_to_plist_object } from './plist-parser.js'
 import { test_info_plist_content, test_plist_as_json } from './plist-parser.test.js'
 
-describe('benchmark', () => {
+describe('serialize', () => {
   bench('serialize', () => {
-    serialize_json_to_plist(test_plist_as_json)
+    serialize_xml_to_plist_object(test_plist_as_json)
   })
+})
 
+describe('deserialize', () => {
   bench('deserialize', () => {
-    deserialize_json_to_plist(test_info_plist_content)
+    deserialize_plist_xml_to_plist_object(test_info_plist_content)
   })
 })

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { deserialize_json_to_plist, serialize_json_to_plist, type plist_value } from '@cruxt/plist-parser'
+import { deserialize_plist_xml_to_plist_object, serialize_xml_to_plist_object, type plist_value } from '@cruxt/plist-parser'
 import { join, resolve } from 'node:path'
 import type { CapacitorModuleOptions } from '../module.js'
 
@@ -38,7 +38,7 @@ export function handle_ios(working_directory: string, options: handle_ios_option
  * @param output_path - Path to write Info.plist file
  */
 function write_plist_to_file(json: plist_value, output_path: string): void {
-  writeFileSync(output_path, serialize_json_to_plist(json), 'utf8')
+  writeFileSync(output_path, serialize_xml_to_plist_object(json), 'utf8')
 }
 
 /**
@@ -50,5 +50,5 @@ function write_plist_to_file(json: plist_value, output_path: string): void {
 function read_info_plist_to_object(info_plist_path: string): Record<string, plist_value> {
   const file_path = resolve(join(info_plist_path))
   if (!existsSync(file_path)) throw new Error('info_plist_not_found' as module_error_types, { cause: file_path })
-  return deserialize_json_to_plist(readFileSync(file_path, 'utf8')) as Record<string, plist_value>
+  return deserialize_plist_xml_to_plist_object(readFileSync(file_path, 'utf8')) as Record<string, plist_value>
 }
