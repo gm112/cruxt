@@ -3,53 +3,117 @@ import { deserialize_plist_xml_to_plist_object, serialize_xml_to_plist_object, t
 
 describe('plist_parser', () => {
   // Happy cases
-  describe('happy_cases', () => {
-    it('serializes_js_object_to_info_plist', () => {
-      expect(() => {
-        const serialized = serialize_xml_to_plist_object(test_plist_as_json)
-        expect(serialized).toEqual(test_info_plist_content)
-      }).not.toThrow()
+  describe('happy cases', () => {
+    describe('serialize', () => {
+      it('serializes js object_to info plist', () => {
+        expect(() => {
+          const serialized = serialize_xml_to_plist_object(test_plist_as_json)
+          expect(serialized).toEqual(test_info_plist_content)
+        }).not.toThrow()
+      })
+
+      it('properly escapes entities in js object strings', () => {
+        expect(() => {
+          const serialized = serialize_xml_to_plist_object({ CFBundleName: 'hello&hello' })
+          expect(serialized).toContain('<string>hello&amp;hello</string>')
+        }).not.toThrow()
+      })
+
+      it('properly handles numbers', () => {
+        expect(() => {
+          const serialized = serialize_xml_to_plist_object({ CFBundleName: 123 })
+          expect(serialized).toContain('<string>123</string>')
+        })
+      })
+
+      it('properly throws an error on NaN numbers', () => {
+        expect(() => serialize_xml_to_plist_object({ CFBundleName: NaN })).toThrowError(/unsupported_value_type/)
+      })
+
+      it('properly throws an error on numbers that fail isNaN test', () => {
+        expect(() => serialize_xml_to_plist_object({ CFBundleName: Infinity })).toThrowError(/unsupported_value_type/)
+      })
     })
 
-    it('deserializes_info_plist_to_js_object', () => {
-      expect(() => {
-        const parsed = deserialize_plist_xml_to_plist_object(test_info_plist_content)
-        try {
+    describe('deserialize', () => {
+      it('deserializes info plist to js object', () => {
+        expect(() => {
+          const parsed = deserialize_plist_xml_to_plist_object(test_info_plist_content)
           expect(parsed).toEqual(test_plist_as_json)
-        }
-        catch (error) {
-          console.log(error)
-          throw error
-        }
-      }).not.toThrow()
+        }).not.toThrow()
+      })
+
+      it('deserializes info plist to js object with entities in strings properly', () => {
+        const test_data = { CFBundleName: 'hello&hello' }
+        const serialized = serialize_xml_to_plist_object(test_data)
+
+        expect(serialized).toEqual(test_plist_with_escaped_entities_as_xml)
+        const parsed = deserialize_plist_xml_to_plist_object(serialized)
+        expect(parsed).toEqual(test_data)
+      })
+
+      it('removes comments from plist', () => {
+        const parsed = deserialize_plist_xml_to_plist_object(test_plist_with_commentsonicthehedgehogs_as_xml)
+        const serialized = serialize_xml_to_plist_object(parsed)
+        expect(serialized).not.toContain('sonicthehedgehog')
+      })
     })
   })
 
   // Unhappy cases
-  describe('error_handling', () => {
-    const _bad_values = [
-      { CFBundleName: function () {} },
-      { CFBundleName: undefined },
-      { Items: ['ok', null] },
-      123,
-    ].map((value, index) => it(`throws_on_unsupported_value_type_${index + 1}`, () => {
-      expect(() =>
-        serialize_xml_to_plist_object(value as unknown as plist_value))
-        .toThrowError(/unsupported_value_type/)
-    }))
+  describe('error handling', () => {
+    describe('serialize', () => {
+      const _bad_values = [
+        { CFBundleName: function () {} },
+        { CFBundleName: undefined },
+        { Items: ['ok', null] },
+        123,
+      ].map((value, index) => it(`throws_on_unsupported_value_type_${index + 1}`, () => {
+        expect(() =>
+          serialize_xml_to_plist_object(value as unknown as plist_value))
+          .toThrowError(/unsupported_value_type/)
+      }))
 
-    it('throws_on_invalid_xml_no_plist_wrapper', () => {
-      const bad_plist = `
+      it('handles empty dict and array correctly', () => {
+        expect(() => {
+          const json = { empty_object: {}, empty_array: [], some_bool: false }
+          const plist = serialize_xml_to_plist_object(json)
+          expect(plist).toContain('<dict/>')
+          expect(plist).toContain('<array/>')
+          expect(plist).toContain('<false/>')
+          const parsed = deserialize_plist_xml_to_plist_object(plist)
+          expect(parsed).toEqual(json)
+        }).not.toThrow()
+      })
+    })
+
+    describe('deserialize', () => {
+      const _bad_plist_tests = [`
 <dict>
   <key>CFBundleName</key>
   <string>MyApp</string>
 </dict>
-`
-      expect(() => deserialize_plist_xml_to_plist_object(bad_plist)).toThrowError(/invalid_xml/)
-    })
-
-    const _malformed_arrays_xml = [
+`.trim(),
       `
+<dict>
+  <key>CFBundleName</key>
+  <string>hello&hello</string>
+</dict>
+
+`.trim(),
+      `
+<dict>
+  <key>CFBundleName</key>
+  <string>hello<hello</string>
+</dict>
+
+`.trim(),
+      ].map((bad_plist, index) => it(`throws on invalid xml no plist wrapper_${index + 1}`, () =>
+        expect(() => deserialize_plist_xml_to_plist_object(bad_plist)).toThrowError(/invalid_xml/),
+      ))
+
+      const _malformed_arrays_xml = [
+        `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -58,7 +122,7 @@ describe('plist_parser', () => {
   </array>
 </plist>
 `.trim(),
-      `
+        `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -66,7 +130,7 @@ describe('plist_parser', () => {
     ???
   </array>
 `.trim(),
-      `
+        `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -85,7 +149,7 @@ describe('plist_parser', () => {
   </array>
 </plist>
 `.trim(),
-      `
+        `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -94,12 +158,12 @@ describe('plist_parser', () => {
   </array>
 </plist>
 `.trim(),
-    ].map((xml, index) => it(`throws_on_malformed_array_content_${index + 1}`, () =>
-      expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/unsupported_tag|invalid_xml/),
-    ))
+      ].map((xml, index) => it(`throws on malformed array content_${index + 1}`, () =>
+        expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/unsupported_tag|invalid_xml/),
+      ))
 
-    const _malformed_dict_tests = [
-      `
+      const _malformed_dict_tests = [
+        `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -109,7 +173,7 @@ describe('plist_parser', () => {
   </dict>
 </plist>
 `.trim(),
-      `
+        `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -128,7 +192,7 @@ describe('plist_parser', () => {
   </dict>
 </plist>
 `.trim(),
-      `
+        `
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -136,20 +200,9 @@ describe('plist_parser', () => {
     <key>
     12345
 `.trim(),
-    ].map((xml, index) => it(`throws_on_malformed_dict_content_${index + 1}_2`, () =>
-      expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
-    ))
-
-    it('handles_empty_dict_and_array_correctly', () => {
-      expect(() => {
-        const json = { empty_object: {}, empty_array: [], some_bool: false }
-        const plist = serialize_xml_to_plist_object(json)
-        expect(plist).toContain('<dict/>')
-        expect(plist).toContain('<array/>')
-        expect(plist).toContain('<false/>')
-        const parsed = deserialize_plist_xml_to_plist_object(plist)
-        expect(parsed).toEqual(json)
-      }).not.toThrow()
+      ].map((xml, index) => it(`throws on malformed dict content_${index + 1}`, () =>
+        expect(() => deserialize_plist_xml_to_plist_object(xml)).toThrowError(/invalid_xml/),
+      ))
     })
   })
 
@@ -241,6 +294,25 @@ export const test_info_plist_content = `
 </dict>
 </plist>
 `.trim()
+
+const test_plist_with_escaped_entities_as_xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>hello&amp;hello</string>
+</dict>
+</plist>`
+
+const test_plist_with_commentsonicthehedgehogs_as_xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+    <!-- sonicthehedgehog -->
+	<string>hello&amp;hello</string>
+</dict>
+</plist>`
 /* eslint-enable @stylistic/no-tabs */
 
 export const test_plist_as_json = {
