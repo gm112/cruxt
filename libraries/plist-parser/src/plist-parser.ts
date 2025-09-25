@@ -105,7 +105,6 @@ function serialize_string(value: string, indent: string) {
   return `${indent}<string>${escape_xml(value)}</string>`
 }
 
-// Supporting real values is not supported by this parser, we only support numbers.
 function serialize_number(value: number, indent: string) {
   return `${indent}<integer>${value}</integer>`
 }
