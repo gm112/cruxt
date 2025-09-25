@@ -6,7 +6,7 @@
  * @see {deserialize_plist_xml_to_plist_object}
  * @link https://code.google.com/archive/p/networkpx/wikis/PlistSpec.wiki
  * @description A single-file zero dependency parser for serializing and deserializing Apple Info.plist files. Supprts only XML formatted plists.
- * Only supports plists with a single root element, that contain only string, number, boolean, array(also nested), and dictionary(also nested) values.
+ * Only supports plists with a single root element, that contain only string, number, boolean, reals, dates, array(also nested), and dictionary(also nested) values.
  * Attempts to conform to Apple's formatting and specifications for plists in the parts of the spec that are supported.
  *
  * Notes for things that are not supported:
@@ -14,7 +14,6 @@
  * - Large files probably won't work due to the use of using regex to extract the <plist> data. Changing deserialization to use a streaming parser would address this if it is an issue.
  * - Comments are ignored and will no-op/be removed when deserializing.
  * - Binary data is ignored, and is untested.
- * - Dates are ignored, and is untested. At the moment I believe it would resolve to a regular string.
  * - All unknown key dictionaries are not supported, and may be treated as a regular JSON object, which may mess up the structure of the plist.
  */
 
@@ -22,7 +21,7 @@
  * Error types that plist_parser can throw.
  */
 export type plist_parser_error_types = 'unsupported_value_type' | 'unsupported_tag' | 'invalid_xml' | 'info_plist_not_found' | 'infinite_loop'
-export type plist_value = string | number | boolean | plist_value[] | { [key: string]: plist_value }
+export type plist_value = string | Date | number | boolean | plist_value[] | { [key: string]: plist_value }
 
 /**
  * Serialize JS object to plist XML
@@ -70,16 +69,30 @@ function serialize_json_to_plist_item_xml(value: plist_value, depth = 0): string
     case 'string': return serialize_string(value, indent)
     case 'boolean': return serialize_boolean(value, indent)
     case 'number':
-      if (!Number.isSafeInteger(value)) break
+      if (!Number.isSafeInteger(value))
+        if (Number.isFinite(value))
+          return serialize_real(value, indent)
+        else
+          throw new Error('unsupported_value_type' as plist_parser_error_types, {
+            cause: { value, type: typeof value },
+          })
       return serialize_number(value, indent)
     case 'object':
       if (Array.isArray(value)) return serialize_array(value, indent, depth)
-      else if (value !== null && value !== undefined) return serialize_object(value as Record<string, plist_value>, indent, depth)
+      else if (value !== null && value !== undefined)
+        if (value instanceof Date)
+          return serialize_date(value as Date, indent)
+        else
+          return serialize_object(value as Record<string, plist_value>, indent, depth)
   }
 
   throw new Error('unsupported_value_type' as plist_parser_error_types, {
     cause: { value, depth, type: typeof value },
   })
+}
+
+function serialize_date(value: Date, indent: string) {
+  return `${indent}<date>${value.toISOString()}</date>`
 }
 
 function serialize_string(value: string, indent: string) {
@@ -89,6 +102,10 @@ function serialize_string(value: string, indent: string) {
 // Supporting real values is not supported by this parser, we only support numbers.
 function serialize_number(value: number, indent: string) {
   return `${indent}<integer>${value}</integer>`
+}
+
+function serialize_real(value: number, indent: string) {
+  return `${indent}<real>${value}</real>`
 }
 
 function serialize_boolean(value: boolean, indent: string) {
@@ -130,16 +147,33 @@ function serialize_object(value: Record<string, plist_value>, indent: string, de
 }
 
 /* Deserialization */
-const plist_parser_regex = /<(dict|array|string|integer)>([\s\S]*?)<\/\1>/
+const plist_parser_regex = /<(dict|array|string|integer|date|real)>([\s\S]*?)<\/\1>/
 function naive_ends_with_closing_tag(xml_fragment: string, _element_name: string) {
   const open = xml_fragment.lastIndexOf('<')
   return open !== -1 && xml_fragment[open + 1] === '/' && xml_fragment[xml_fragment.length - 1] === '>'
+}
+
+const plist_date_iso8601_regex = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/
+function deserialize_plist_date_to_date_object(xml_fragment: string) {
+  const match = xml_fragment.match(plist_date_iso8601_regex)
+  if (!match) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment } })
+
+  const [, year, month, day, hour, minute, second] = match
+  return new Date(Date.UTC(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    Number(second),
+  ))
 }
 
 function deserialize_xml_fragment_to_plist_value_object(xml_fragment: string): plist_value {
   if (xml_fragment === '<true/>' || xml_fragment === '<false/>') return xml_fragment === '<true/>'
   else if (xml_fragment === '<array/>') return []
   else if (xml_fragment === '<dict/>') return {}
+  else if (xml_fragment === '<date/>') return new Date(0)
   else if (!naive_ends_with_closing_tag(xml_fragment, '')) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment } })
 
   const match = xml_fragment.match(plist_parser_regex)
@@ -152,11 +186,17 @@ function deserialize_xml_fragment_to_plist_value_object(xml_fragment: string): p
   if (tag === 'string') return unescape_xml(content!)
   else if (tag === 'dict') return deserialize_plist_dict_to_object(content!)
   else if (tag === 'array') return deserialize_plist_array_to_object(content!)
+  else if (tag === 'date') return deserialize_plist_date_to_date_object(content!)
   else if (tag === 'true' || tag === 'false') return tag === 'true'
   else if (tag === 'integer') {
     const number_value = Number(content!)
     if (Number.isSafeInteger(number_value))
-      return parseInt(content!) // Reals probably could be supported if we added a check for if the value is a fixed int or not.
+      return parseInt(content!)
+  }
+  else if (tag === 'real') {
+    const number_value = Number(content!)
+    if (Number.isFinite(number_value))
+      return number_value
   }
 
   throw new Error('invalid_xml' as plist_parser_error_types, {

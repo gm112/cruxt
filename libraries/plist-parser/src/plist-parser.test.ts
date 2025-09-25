@@ -26,6 +26,20 @@ describe('plist_parser', () => {
         })
       })
 
+      it('properly handles dates', () => {
+        expect(() => {
+          const serialized = serialize_xml_to_plist_object({ CFBundleName: new Date() })
+          expect(serialized).toContain('<date>')
+        }).not.toThrow()
+      })
+
+      it('properly handles real numbers', () => {
+        expect(() => {
+          const serialized = serialize_xml_to_plist_object({ CFBundleName: 123.456 })
+          expect(serialized).toContain('<real>123.456</real>')
+        }).not.toThrow()
+      })
+
       it('properly throws an error on NaN numbers', () => {
         expect(() => serialize_xml_to_plist_object({ CFBundleName: NaN })).toThrowError(/unsupported_value_type/)
       })
@@ -56,6 +70,18 @@ describe('plist_parser', () => {
         const parsed = deserialize_plist_xml_to_plist_object(test_plist_with_commentsonicthehedgehogs_as_xml)
         const serialized = serialize_xml_to_plist_object(parsed)
         expect(serialized).not.toContain('sonicthehedgehog')
+      })
+
+      it('properly handles dates', () => {
+        const parsed = deserialize_plist_xml_to_plist_object(test_plist_with_date_as_xml)
+        const serialized = serialize_xml_to_plist_object(parsed)
+        expect(serialized).toEqual(test_plist_with_date_as_xml)
+      })
+
+      it('properly handles real numbers', () => {
+        const parsed = deserialize_plist_xml_to_plist_object(test_plist_with_real_as_xml)
+        const serialized = serialize_xml_to_plist_object(parsed)
+        expect(serialized).toEqual(test_plist_with_real_as_xml)
       })
     })
   })
@@ -298,6 +324,24 @@ const test_plist_with_commentsonicthehedgehogs_as_xml = `<?xml version="1.0" enc
 	<key>CFBundleName</key>
     <!-- sonicthehedgehog -->
 	<string>hello&amp;hello</string>
+</dict>
+</plist>`
+
+const test_plist_with_date_as_xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<date>2023-01-01T00:00:00.000Z</date>
+</dict>
+</plist>`
+
+const test_plist_with_real_as_xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<real>123.456</real>
 </dict>
 </plist>`
 /* eslint-enable @stylistic/no-tabs */
