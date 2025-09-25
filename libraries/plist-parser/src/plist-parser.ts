@@ -171,7 +171,7 @@ function deserialize_plist_dict_to_object(xml_fragment: string) {
   // Starting the loop at 1 because we do not want to look at the first element.
   for (let index = 1; index + 1 < parts.length; index += 2) {
     const key_part = parts[index]
-    if (typeof key_part !== 'string' || result[key_part])
+    if (typeof key_part !== 'string' || result[key_part] !== undefined)
       throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment, key_part, value_part: parts[index + 1] } })
 
     const value_part = parts[index + 1]
