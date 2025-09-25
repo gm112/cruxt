@@ -13,7 +13,7 @@
  * Notes for things that are not supported:
  * - Does not care about UTF-16 encoding support. Untested, but might work fine.
  * - Large files probably won't work due to the use of using regex to extract the <plist> data. Changing deserialization to use a streaming parser would address this if it is an issue.
- * - Binary data is ignored, and is untested.
+ * - Binary data is not implemented, and will throw an error.
  */
 
 /**
