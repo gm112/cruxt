@@ -19,6 +19,9 @@
  * - All unknown key dictionaries are not supported, and may be treated as a regular JSON object, which may mess up the structure of the plist.
  */
 
+/**
+ * Error types that plist_parser can throw.
+ */
 export type plist_parser_error_types = 'unsupported_value_type' | 'unsupported_tag' | 'invalid_xml' | 'info_plist_not_found' | 'infinite_loop'
 export type plist_value = string | number | boolean | plist_value[] | { [key: string]: plist_value }
 
@@ -144,13 +147,13 @@ function deserialize_xml_fragment_to_plist_value_object(xml_fragment: string): p
       cause: { xml: xml_fragment },
     })
   const [, tag, content] = match
-  // if (!xml_fragment.endsWith(`</${tag}>`)) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment } })
 
   if (tag === 'string') return unescape_xml(content!)
   else if (tag === 'dict') return deserialize_plist_dict_to_object(content!)
   else if (tag === 'array') return deserialize_plist_array_to_object(content!)
-  else if (tag === 'number') return parseFloat(content!)
+  else if (tag === 'number' && Number.isSafeInteger(Number(content))) return parseInt(content!) // Real's probably could be supported if we added a check for if the value is a fixed int or not.
   else if (tag === 'true' || tag === 'false') return tag === 'true'
+
   throw new Error('invalid_xml' as plist_parser_error_types, {
     cause: { xml: xml_fragment },
   })
@@ -159,12 +162,18 @@ function deserialize_xml_fragment_to_plist_value_object(xml_fragment: string): p
 const plist_key_element_regex = /<key>([\s\S]*?)<\/key>/
 function deserialize_plist_dict_to_object(xml_fragment: string) {
   const result: Record<string, plist_value> = {}
-  const parts = xml_fragment.split(plist_key_element_regex)?.slice(1)
+  const parts = xml_fragment.split(plist_key_element_regex)
 
-  for (let index = 0; index + 1 < parts.length; index += 2) {
-    const [key_part, value_part] = parts.slice(index, index + 2)
+  // Starting the loop at 1 because we do not want to look at the first element.
+  for (let index = 1; index + 1 < parts.length; index += 2) {
+    const key_part = parts[index]
+    if (typeof key_part !== 'string')
+      throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment, key_part, value_part: parts[index + 1] } })
+
+    const value_part = parts[index + 1]
     const value_xml = value_part?.trim()
-    if (typeof key_part !== 'string' || !value_xml) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment, key_part, value_part } })
+
+    if (!value_xml) throw new Error('invalid_xml' as plist_parser_error_types, { cause: { xml: xml_fragment, key_part, value_part } })
     result[key_part] = deserialize_xml_fragment_to_plist_value_object(value_xml)
   }
 
@@ -179,11 +188,12 @@ function deserialize_plist_array_to_object(xml_fragment: string) {
   while (remaining) {
     const xml_part_length = remaining.length
     const [content, tag] = remaining.match(plist_parser_array_self_closing_tag_regex) ?? []
-    if (content && tag) {
+
+    if (content) {
       if (tag === 'array') result.push([])
       else if (tag === 'dict') result.push({})
 
-      remaining = remaining.slice(content.length).trim()
+      remaining = remaining.substring(content.length).trim()
       continue
     }
 
@@ -192,7 +202,7 @@ function deserialize_plist_array_to_object(xml_fragment: string) {
 
     const [item] = remaining.match(plist_parser_regex)! // arrays only support booleans, strings, dicts, and arrays.
     result.push(deserialize_xml_fragment_to_plist_value_object(item))
-    remaining = remaining.slice(item.length).trim()
+    remaining = remaining.substring(item.length).trim()
     // sanity check: ensure we made progress
     if (remaining.length === xml_part_length)
       throw new Error('infinite_loop' as plist_parser_error_types, { cause: { remaining_length: remaining.length, xml_length: xml_part_length, remaining, xml: xml_fragment } })
