@@ -72,13 +72,13 @@ runs:
       shell: bash
       run: |
         echo "Building Projects"
-        pnpm run --parallel build & build_pid=$!
+        pnpm run build:all & build_pid=$!
 
         echo "Validating Code Formatting"
-        pnpm run --parallel lint & lint_pid=$!
+        pnpm run lint:all & lint_pid=$!
 
         echo "Testing Projects"
-        pnpm run --parallel test & test_pid=$!
+        pnpm run test:all & test_pid=$!
 
         wait $build_pid; build_exit_code=$?
         wait $lint_pid; lint_exit_code=$?
