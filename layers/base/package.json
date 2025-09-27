@@ -17,20 +17,21 @@
     "@nuxt/kit": "catalog:"
   },
   "devDependencies": {
-    "nuxt": "catalog:",
+    "@googlemaps/markerclusterer": "catalog:",
+    "@nuxt/eslint": "catalog:",
     "@nuxt/fonts": "catalog:",
     "@nuxt/icon": "catalog:",
     "@nuxt/scripts": "catalog:",
     "@nuxt/test-utils": "catalog:",
     "@nuxt/ui": "catalog:",
     "@nuxtjs/i18n": "catalog:",
-    "@nuxt/eslint": "catalog:",
+    "@unhead/vue": "catalog:",
     "eslint": "catalog:",
+    "nuxt": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite-plugin-eslint2": "catalog:",
-    "@unhead/vue": "catalog:",
-    "vue-tsc": "catalog:",
-    "vue": "catalog:"
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   }
 }

@@ -37,8 +37,6 @@
     "@capacitor/push-notifications": "catalog:",
     "@capacitor/splash-screen": "catalog:",
     "@capacitor/toast": "catalog:",
-    "@transistorsoft/capacitor-background-fetch": "catalog:",
-    "@transistorsoft/capacitor-background-geolocation": "catalog:",
     "@trapezedev/project": "catalog:"
   }
 }
