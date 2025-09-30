@@ -1,7 +1,8 @@
 # Documentation can be found at file://./README.md
 name: CI
 on:
-  pull_request:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
     branches:
       - main
     paths:
