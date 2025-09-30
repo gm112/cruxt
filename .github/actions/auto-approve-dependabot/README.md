@@ -4,7 +4,11 @@ Automatically approve dependabot PRs if the workflow is triggered by dependabot.
 
 ## Inputs
 
-None
+### `github-token`
+
+**Required:** false
+
+**Default:** `${{ github.token }}`
 
 ## Outputs
 

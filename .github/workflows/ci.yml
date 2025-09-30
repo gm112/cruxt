@@ -46,9 +46,5 @@ jobs:
             contents: write
             pull-requests: write
         steps:
-            - uses: actions/checkout@v5
-              with:
-                  sparse-checkout: |
-                      ./.github/actions/auto-approve-dependabot
             - name: Check if run is triggered by dependabot
               uses: ./.github/actions/auto-approve-dependabot
