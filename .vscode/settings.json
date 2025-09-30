@@ -2,6 +2,7 @@
   "prettier.enable": false,
   "eslint.enable": true,
   "eslint.format.enable": true,
+  "eslint.nodePath": "node_modules",
   "eslint.validate": [
     "javascript",
     "javascriptreact",

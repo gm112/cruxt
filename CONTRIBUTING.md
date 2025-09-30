@@ -4,6 +4,7 @@
   - [Development Guide](#development-guide)
     - [Install dependencies](#install-dependencies)
     - [Project setup](#project-setup)
+    - [Using Nix Development Environment](#using-nix-development-environment)
   - [Development Process](#development-process)
     - [Run the playground](#run-the-playground)
     - [Run the tests](#run-the-tests)
@@ -37,6 +38,16 @@ git clone https://github.com/gm112/cruxt
 cd cruxt
 corepack enable
 pnpm install
+```
+
+### Using Nix Development Environment
+
+We provide a Nix development environment to make development easier at [./flake.nix](./flake.nix).
+
+- [ ] Install [Nix](https://nixos.org/download.html)
+
+```bash
+nix develop
 ```
 
 ## Development Process
