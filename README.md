@@ -16,4 +16,4 @@ pnpm create nuxt@latest --template gm112/cruxt/templates/nuxt-v4-mobile-app-with
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/gm112/cruxt/blob/main/CONTRIBUTING.md)
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
