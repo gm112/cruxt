@@ -6,7 +6,7 @@ runs:
   steps:
     - name: Check if run is triggered by dependabot
       run: |
-        if [[ "${{github.event_name}}" == "pull_request" ]]; then
+        if [[ "${{github.event.pull_request.user.login}}" == "dependabot[bot]" ]]; then
           echo "is_dependabot_pr=true" >> $GITHUB_OUTPUT
           echo "Workflow is triggered by dependabot PR, continuing"
         else
