@@ -52,6 +52,3 @@ jobs:
                       ./.github/actions/auto-approve-dependabot
             - name: Check if run is triggered by dependabot
               uses: ./.github/actions/auto-approve-dependabot
-
-
-
