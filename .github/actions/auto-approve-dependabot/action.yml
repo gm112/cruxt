@@ -1,6 +1,11 @@
 # Documentation can be found at file://./README.md
 name: 'Auto approve dependabot PRs'
 description: 'Automatically approve dependabot PRs'
+inputs:
+  github-token:
+    description: 'GitHub token'
+    required: false
+    default: ${{ github.token }}
 runs:
   using: 'composite'
   steps:
@@ -33,4 +38,4 @@ runs:
         gh pr merge --auto --merge "${{github.event.pull_request.html_url}}"
       env:
         PR_URL: ${{github.event.pull_request.html_url}}
-        GITHUB_TOKEN: ${{github.token}}
+        GITHUB_TOKEN: ${{inputs.github-token}}
