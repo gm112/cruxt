@@ -11,6 +11,7 @@
   "scripts": {
     "prepare": "pnpm workspace:setup:all",
     "playground": "pnpm run --filter=nuxt-v4-mobile-app-with-auth dev",
+    "build:all": "pnpm run --parallel build",
     "test:all": "pnpm run --parallel test",
     "format:all": "pnpm run --parallel format",
     "lint:all": "pnpm run --parallel lint",
