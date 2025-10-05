@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { deserialize_plist_xml_to_plist_object, serialize_xml_to_plist_object, type plist_value } from './plist-parser.js'
+import { deserialize_plist_xml_to_plist_object, serialize_plist_object_to_plist_xml, type plist_value } from './plist-parser.js'
 
 describe('plist_parser', () => {
   // Happy cases
@@ -7,45 +7,45 @@ describe('plist_parser', () => {
     describe('serialize', () => {
       it('serializes js object_to info plist', () => {
         expect(() => {
-          const serialized = serialize_xml_to_plist_object(test_plist_as_json)
+          const serialized = serialize_plist_object_to_plist_xml(test_plist_as_json)
           expect(serialized).toEqual(test_info_plist_content)
         }).not.toThrow()
       })
 
       it('properly escapes entities in js object strings', () => {
         expect(() => {
-          const serialized = serialize_xml_to_plist_object({ CFBundleName: 'hello&hello' })
+          const serialized = serialize_plist_object_to_plist_xml({ CFBundleName: 'hello&hello' })
           expect(serialized).toContain('<string>hello&amp;hello</string>')
         }).not.toThrow()
       })
 
       it('properly handles numbers', () => {
         expect(() => {
-          const serialized = serialize_xml_to_plist_object({ CFBundleName: 123 })
+          const serialized = serialize_plist_object_to_plist_xml({ CFBundleName: 123 })
           expect(serialized).toContain('<string>123</string>')
         })
       })
 
       it('properly handles dates', () => {
         expect(() => {
-          const serialized = serialize_xml_to_plist_object({ CFBundleName: new Date() })
+          const serialized = serialize_plist_object_to_plist_xml({ CFBundleName: new Date() })
           expect(serialized).toContain('<date>')
         }).not.toThrow()
       })
 
       it('properly handles real numbers', () => {
         expect(() => {
-          const serialized = serialize_xml_to_plist_object({ CFBundleName: 123.456 })
+          const serialized = serialize_plist_object_to_plist_xml({ CFBundleName: 123.456 })
           expect(serialized).toContain('<real>123.456</real>')
         }).not.toThrow()
       })
 
       it('properly throws an error on NaN numbers', () => {
-        expect(() => serialize_xml_to_plist_object({ CFBundleName: NaN })).toThrowError(/unsupported_value_type/)
+        expect(() => serialize_plist_object_to_plist_xml({ CFBundleName: NaN })).toThrowError(/unsupported_value_type/)
       })
 
       it('properly throws an error on numbers that fail isNaN test', () => {
-        expect(() => serialize_xml_to_plist_object({ CFBundleName: Infinity })).toThrowError(/unsupported_value_type/)
+        expect(() => serialize_plist_object_to_plist_xml({ CFBundleName: Infinity })).toThrowError(/unsupported_value_type/)
       })
     })
 
@@ -59,7 +59,7 @@ describe('plist_parser', () => {
 
       it('deserializes info plist to js object with entities in strings properly', () => {
         const test_data = { CFBundleName: 'hello&hello' }
-        const serialized = serialize_xml_to_plist_object(test_data)
+        const serialized = serialize_plist_object_to_plist_xml(test_data)
 
         expect(serialized).toEqual(test_plist_with_escaped_entities_as_xml)
         const parsed = deserialize_plist_xml_to_plist_object(serialized)
@@ -68,19 +68,19 @@ describe('plist_parser', () => {
 
       it('removes comments from plist', () => {
         const parsed = deserialize_plist_xml_to_plist_object(test_plist_with_commentsonicthehedgehogs_as_xml)
-        const serialized = serialize_xml_to_plist_object(parsed)
+        const serialized = serialize_plist_object_to_plist_xml(parsed)
         expect(serialized).not.toContain('sonicthehedgehog')
       })
 
       it('properly handles dates', () => {
         const parsed = deserialize_plist_xml_to_plist_object(test_plist_with_date_as_xml)
-        const serialized = serialize_xml_to_plist_object(parsed)
+        const serialized = serialize_plist_object_to_plist_xml(parsed)
         expect(serialized).toEqual(test_plist_with_date_as_xml)
       })
 
       it('properly handles real numbers', () => {
         const parsed = deserialize_plist_xml_to_plist_object(test_plist_with_real_as_xml)
-        const serialized = serialize_xml_to_plist_object(parsed)
+        const serialized = serialize_plist_object_to_plist_xml(parsed)
         expect(serialized).toEqual(test_plist_with_real_as_xml)
       })
     })
@@ -97,14 +97,14 @@ describe('plist_parser', () => {
         123,
       ].map((value, index) => it(`throws_on_unsupported_value_type_${index + 1}`, () => {
         expect(() =>
-          serialize_xml_to_plist_object(value as unknown as plist_value))
+          serialize_plist_object_to_plist_xml(value as unknown as plist_value))
           .toThrowError(/unsupported_value_type/)
       }))
 
       it('handles empty dict and array correctly', () => {
         expect(() => {
           const json = { empty_object: {}, empty_array: [], some_bool: false }
-          const plist = serialize_xml_to_plist_object(json)
+          const plist = serialize_plist_object_to_plist_xml(json)
           expect(plist).toContain('<dict/>')
           expect(plist).toContain('<array/>')
           expect(plist).toContain('<false/>')

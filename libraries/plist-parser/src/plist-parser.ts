@@ -2,7 +2,7 @@
  * @module plist_parser
  * @license MPL-2.0
  * @author Jonathan Basniak
- * @see {serialize_xml_to_plist_object}
+ * @see {serialize_plist_object_to_plist_xml}
  * @see {deserialize_plist_xml_to_plist_object}
  * @link https://code.google.com/archive/p/networkpx/wikis/PlistSpec.wiki
  * @link https://www.apple.com/DTDs/PropertyList-1.0.dtd
@@ -32,7 +32,7 @@ export type plist_value = string | Uint8Array | Date | number | boolean | plist_
  * @param jason - JS object to serialize
  * @returns plist XML string
  */
-export function serialize_xml_to_plist_object(jason: plist_value): string {
+export function serialize_plist_object_to_plist_xml(jason: plist_value): string {
   if (typeof jason !== 'object' || jason === null || jason === undefined)
     throw new Error('unsupported_value_type' as plist_parser_error_types, {
       cause: { value: jason, type: typeof jason },

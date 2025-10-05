@@ -1,3 +1,3 @@
-import config from '@cruxt/base/eslint.config.mjs'
+import config from '../../layers/base/eslint.config.mjs'
 
 export default config

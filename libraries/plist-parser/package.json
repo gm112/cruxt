@@ -17,7 +17,6 @@
   },
   "devDependencies": {
     "vitest": "catalog:",
-    "typescript": "catalog:",
-    "@cruxt/base": "workspace:*"
+    "typescript": "catalog:"
   }
 }
