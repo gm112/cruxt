@@ -15,7 +15,6 @@
     { "path": "./layers/base" },
     { "path": "./layers/auth" },
     { "path": "./layers/ui" },
-    { "path": "./modules/nuxt-module-template-project" },
-    { "path": "./modules/nuxt-module-capacitor" }
+    { "path": "./modules/nuxt-module-template-project" }
   ]
 }
